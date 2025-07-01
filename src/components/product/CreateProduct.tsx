@@ -147,7 +147,7 @@ const onDrop = (acceptedFiles: File[]) => {
               size="md"
               variant="primary"
               startIcon={<BoxIcon className="size-5" 
-              onCLick=""/>}
+              />}
             >
               Button Text
             </Button>

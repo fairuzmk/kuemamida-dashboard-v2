@@ -17,6 +17,8 @@ import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
 import AddProduct from "./pages/AddProduct/AddProduct";
+import ListProduct from "./pages/ListProduct/ListProduct";
+import OrderPage from "./pages/Order/OrderPage";
 
 export default function App() {
   return (
@@ -32,7 +34,11 @@ export default function App() {
             <Route path="/add-product" element={<AddProduct />} />
             
             {/* List Products */}
-            
+            <Route path="/list-product" element={<ListProduct/>} />
+
+            {/* Orders */}
+            <Route path="/orders" element={<OrderPage/>} />
+
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
             <Route path="/calendar" element={<Calendar />} />
