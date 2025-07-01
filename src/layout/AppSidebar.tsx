@@ -11,7 +11,7 @@ import {
   ListIcon,
   PageIcon,
   PieChartIcon,
-  PlugInIcon,
+
   TableIcon,
   UserCircleIcon,
 } from "../icons";
@@ -29,8 +29,30 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path: "/"
   },
+    {
+    icon: <GridIcon />,
+    name: "Products",
+    subItems: [
+      { name: "Add Product", path: "/add-product", pro: false },
+      { name: "List Product", path: "/list-product", pro: false },
+    ],
+  },
+  {
+    icon: <GridIcon />,
+    name: "Orders",
+    path: "/basic-tables"
+  },
+  {
+    icon: <UserCircleIcon />,
+    name: "User",
+    path: "/users"
+  },
+  
+];
+
+const othersItems: NavItem[] = [
   {
     icon: <CalenderIcon />,
     name: "Calendar",
@@ -59,9 +81,6 @@ const navItems: NavItem[] = [
       { name: "404 Error", path: "/error-404", pro: false },
     ],
   },
-];
-
-const othersItems: NavItem[] = [
   {
     icon: <PieChartIcon />,
     name: "Charts",
@@ -82,14 +101,7 @@ const othersItems: NavItem[] = [
       { name: "Videos", path: "/videos", pro: false },
     ],
   },
-  {
-    icon: <PlugInIcon />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
+ 
 ];
 
 const AppSidebar: React.FC = () => {
