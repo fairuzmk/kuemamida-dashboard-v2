@@ -19,12 +19,14 @@ import Home from "./pages/Dashboard/Home";
 import AddProduct from "./pages/AddProduct/AddProduct";
 import ListProduct from "./pages/ListProduct/ListProduct";
 import OrderPage from "./pages/Order/OrderPage";
+import { ToastContainer} from 'react-toastify';
 
 export default function App() {
   return (
     <>
       <Router>
         <ScrollToTop />
+        <ToastContainer/>
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>

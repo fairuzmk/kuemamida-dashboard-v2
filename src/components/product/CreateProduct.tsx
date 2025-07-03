@@ -10,6 +10,7 @@ import Button from "../../components/ui/button/Button";
 // import {  } from "../../icons";
 // import Dropzone from "react-dropzone";
 import axios from "axios"
+import { toast } from "react-toastify";
 
 
 
@@ -92,9 +93,10 @@ const onDrop = (acceptedFiles: File[]) => {
         description: "",
       })
       setFiles([])
+      toast.success(response.data.message)
     }
     else{
-
+      toast.error(response.data.message)
     }
   }
 
