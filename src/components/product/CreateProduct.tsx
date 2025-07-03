@@ -3,23 +3,26 @@ import ComponentCard from "../common/ComponentCard";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Select from "../form/Select";
-import TextArea from "../form/input/TextArea";
+
 import { useDropzone } from "react-dropzone";
 import { useState } from "react";
 import Button from "../../components/ui/button/Button";
-import { BoxIcon } from "../../icons";
+// import {  } from "../../icons";
 // import Dropzone from "react-dropzone";
+import axios from "axios"
 
 
 
 export default function CreateProduct() {
 
-const [message, setMessage] = useState("");
+
+const url = "http://localhost:4000";
+const [files, setFiles] = useState<File[]>([]);
 
 const onDrop = (acceptedFiles: File[]) => {
-    console.log("Files dropped:", acceptedFiles);
-    // Handle file uploads here
-  };
+  console.log("Files dropped:", acceptedFiles);
+  setFiles(acceptedFiles);
+};
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -32,30 +35,91 @@ const onDrop = (acceptedFiles: File[]) => {
   });
   
   const options = [
-    { value: "marketing", label: "Marketing" },
-    { value: "template", label: "Template" },
-    { value: "development", label: "Development" },
+    { value: "Kue Ultah", label: "Kue Ultah" },
+    { value: "Cake Potong", label: "Cake Potong" },
+    { value: "Kue Brownies", label: "Kue Brownies" },
+    { value: "Kue Bolen", label: "Bolen Pisang" },
+    { value: "Kue Risol", label: "Risol" },
+    { value: "Snack Box", label: "Snack Box" },
+    { value: "Kue Kering", label: "Kue Kering" },
+  
+
   ];
-  const handleSelectChange = (value: string) => {
-    console.log("Selected value:", value);
+
+
+  const[data,setData] = useState({
+      name: "",
+      category: "",
+      price: "",
+      stock: "",
+      description: "",
+  })
+
+  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+    setData(data=>({...data, [name]:value}))
+
+  }
+  
+  const onSelectChange = (value: string) => {
+    setData((prev) => ({ ...prev, category: value }));
   };
+
+
+  // useEffect(()=>{
+  //   console.log(data);
+  // }, [data])
+
+  const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("name", data.name)
+    formData.append("category", data.category)
+    formData.append("price", data.price)
+    formData.append("stock", data.stock)
+    formData.append("description", data.description)
+    files.forEach((file) => {
+      formData.append("image", file);
+    })
+    const response = await axios.post(`${url}/api/food/add`, formData);
+    if (response.data.success){
+      setData({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+        description: "",
+      })
+      setFiles([])
+    }
+    else{
+
+    }
+  }
 
   return (
     <>
     <ComponentCard title="Tambahkan Produk">
+      <form onSubmit={onSubmitHandler}>
       <div className="space-y-6">
         <div className="grid grid-cols-2 gap-6">
             <div>
             <Label htmlFor="input">Nama Produk</Label>
-            <Input type="text" id="input" />
+            <Input 
+            type="text"  
+            id="name"
+            name="name"
+            onChange={onChangeHandler} value={data.name}/>
             </div>
             <div>
             <Label>Pilih Kategori</Label>
             <Select
                 options={options}
                 placeholder="Select an option"
-                onChange={handleSelectChange}
+                onChange={onSelectChange}
                 className="dark:bg-dark-900"
+                name="category"
             />
             </div>
         </div>
@@ -68,6 +132,9 @@ const onDrop = (acceptedFiles: File[]) => {
                 type="number"
                 placeholder="Harga Produk"
                 className="pl-[62px]"
+                name="price"
+                onChange={onChangeHandler}
+                value={data.price}
                 />
                 <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
                 Rp
@@ -76,36 +143,42 @@ const onDrop = (acceptedFiles: File[]) => {
             </div>
             <div>
             <Label htmlFor="stock">Stock</Label>
-            <Input type="number" id="stock" />
+            <Input 
+            type="number" 
+            id="stock" 
+            name="stock"
+            onChange={onChangeHandler}
+            value={data.stock}
+            
+            />
             </div>
         </div>
          
         <div>
           <Label>Description</Label>
-          <TextArea
-            value={message}
-            onChange={(value) => setMessage(value)}
-            rows={6}
-          />
+          <Input 
+            type="text"  
+            id="description"
+            name="description"
+            onChange={onChangeHandler} value={data.description}/>
         </div>
     <div>
         <Label htmlFor="stock">Gambar Produk</Label>
     </div>
     <div className="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500">
+    {files.length === 0 ? (
         <form
           {...getRootProps()}
-          className={`dropzone rounded-xl   border-dashed border-gray-300 p-7 lg:p-10
-        ${
-          isDragActive
-            ? "border-brand-500 bg-gray-100 dark:bg-gray-800"
-            : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
-        }
-      `}
+          className={`dropzone rounded-xl border-dashed border-gray-300 p-7 lg:p-10 ${
+            isDragActive
+              ? "border-brand-500 bg-gray-100 dark:bg-gray-800"
+              : "border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-900"
+          }`}
           id="demo-upload"
         >
-          {/* Hidden Input */}
           <input {...getInputProps()} />
-
+          <div className="dz-message flex flex-col items-center m-0!">
+            {/* Icon + Text area */}
           <div className="dz-message flex flex-col items-center m-0!">
             {/* Icon Container */}
             <div className="mb-[22px] flex justify-center">
@@ -139,21 +212,48 @@ const onDrop = (acceptedFiles: File[]) => {
               Browse File
             </span>
           </div>
-        </form>
+          </div>
+          </form>
+          ) : (
+
+            <div className="mt-4 flex gap-4 items-center justify-center">
+              {files.map((file, index) => (
+                <div key={index} className="w-50 h-50 overflow-hidden rounded border flex flex-col items-center ">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    className="w-full h-full object-contain items-center"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {files.length > 0 && (
+              <div className="mt-4 mb-4 flex justify-center ">             
+              <button
+                type="button"
+                className="text-md text-red-500 underline"
+                onClick={() => setFiles([])}
+              >
+                Ganti Gambar
+              </button>
+              </div>
+            )}
+
       </div>
 
          
        <Button
               size="md"
               variant="primary"
-              startIcon={<BoxIcon className="size-5" 
-              />}
+              
+              
             >
-              Button Text
+              Tambah Produk
             </Button>
        
       </div>
-    
+    </form>
     </ComponentCard>
     
     
