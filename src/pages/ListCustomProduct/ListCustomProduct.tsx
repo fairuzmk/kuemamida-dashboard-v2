@@ -1,20 +1,20 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
 import PageMeta from "../../components/common/PageMeta";
-import ListProductsComponent from "../../components/product/ListProductsComponent";
+import ListCustomComponent from "../../components/custom-product/ListCustomComponent";
 
 
-export default function ListProduct() {
+export default function ListCustomProduct() {
   return (
     <>
       <PageMeta
-        title="List Product"
+        title="List Custom Product"
         description=""
       />
-      <PageBreadcrumb pageTitle="List Product" />
+      <PageBreadcrumb pageTitle="List Custom Product" />
       <div className="space-y-6">
         <ComponentCard title="Daftar Produk">
-          <ListProductsComponent/>  
+          <ListCustomComponent/>  
         </ComponentCard>
       </div>
     </>

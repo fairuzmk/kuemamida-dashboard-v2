@@ -13,7 +13,9 @@ import {
   UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
-
+import { FaShippingFast, FaBirthdayCake } from "react-icons/fa";
+import { IoFastFood } from "react-icons/io5";
+import { MdOutlineLibraryAdd } from "react-icons/md";
 
 type NavItem = {
   name: string;
@@ -28,16 +30,26 @@ const navItems: NavItem[] = [
     name: "Dashboard",
     path: "/"
   },
-    {
-    icon: <BoxCubeIcon />,
+  {
+    icon: <IoFastFood />,
     name: "Products",
     subItems: [
       { name: "Add Product", path: "/add-product", pro: false },
+      
       { name: "List Product", path: "/list-product", pro: false },
     ],
   },
   {
-    icon: <PaperPlaneIcon />,
+    icon: <FaBirthdayCake />,
+    name: "Custom Products",
+    subItems: [
+      { name: "Add Product", path: "/add-custom-product", pro: false },
+      { name: "List Product", path: "/list-custom-product", pro: false },
+      { name: "Data Harga", path: "/data-custom-order", pro: false },
+    ],
+  },
+  {
+    icon: <FaShippingFast/>,
     name: "Orders",
     path: "/orders"
   },
@@ -317,14 +329,14 @@ const AppSidebar: React.FC = () => {
             <>
               <img
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logomamida.svg"
                 alt="Logo"
                 width={150}
                 height={40}
               />
               <img
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                src="/images/logo/logomamida-dark.svg"
                 alt="Logo"
                 width={150}
                 height={40}
@@ -332,7 +344,7 @@ const AppSidebar: React.FC = () => {
             </>
           ) : (
             <img
-              src="/images/logo/logo-icon.svg"
+              src="/images/logo/mamidaicon.svg"
               alt="Logo"
               width={32}
               height={32}

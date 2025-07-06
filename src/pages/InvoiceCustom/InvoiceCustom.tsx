@@ -1,20 +1,20 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import ComponentCard from "../../components/common/ComponentCard";
 import PageMeta from "../../components/common/PageMeta";
-import ListProductsComponent from "../../components/product/ListProductsComponent";
+import InvoiceComponent from "../../components/custom-product/InvoiceComponent";
 
 
-export default function ListProduct() {
+export default function InvoiceCustom() {
   return (
     <>
       <PageMeta
-        title="List Product"
+        title="Invoice Custom Product"
         description=""
       />
-      <PageBreadcrumb pageTitle="List Product" />
+      <PageBreadcrumb pageTitle="Invoice Custom Product" />
       <div className="space-y-6">
-        <ComponentCard title="Daftar Produk">
-          <ListProductsComponent/>  
+        <ComponentCard title="Invoice Pesanan">
+          <InvoiceComponent/>  
         </ComponentCard>
       </div>
     </>

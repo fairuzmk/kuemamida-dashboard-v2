@@ -1,19 +1,18 @@
 import PageBreadcrumb from "../../components/common/PageBreadCrumb";
 import PageMeta from "../../components/common/PageMeta";
-import CreateProduct from "../../components/product/CreateProduct";
+import EditProductComponent from "../../components/product/EditProductComponent";
 
-export default function AddProduct() {
-  
+export default function EditProduct() {
   return (
     <div>
       <PageMeta
-        title="Add Your Product"
+        title="Edit Your Product"
         description=""
       />
-      <PageBreadcrumb pageTitle="Add Products" />
+      <PageBreadcrumb pageTitle="Edit Products" />
       <div className="grid grid-cols-1 gap-6">
         <div className="space-y-6">
-          <CreateProduct/>
+          <EditProductComponent/>
 
         </div>
         

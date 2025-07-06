@@ -11,13 +11,15 @@ import Button from "../../components/ui/button/Button";
 // import Dropzone from "react-dropzone";
 import axios from "axios"
 import { toast } from "react-toastify";
+import Switch from "../form/switch/Switch";
+import { useUrl } from "../../context/UrlContext";
 
 
 
 export default function CreateProduct() {
 
 
-const url = "http://localhost:4000";
+const url = useUrl
 const [files, setFiles] = useState<File[]>([]);
 
 const onDrop = (acceptedFiles: File[]) => {
@@ -54,6 +56,7 @@ const onDrop = (acceptedFiles: File[]) => {
       price: "",
       stock: "",
       description: "",
+      inStock: true,
   })
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,12 +64,26 @@ const onDrop = (acceptedFiles: File[]) => {
     const value = event.target.value;
     setData(data=>({...data, [name]:value}))
 
+
+    if (name === "price") {
+    
+      const cleaned = value.replace(/\D/g, "");
+      setData((prev) => ({ ...prev, [name]: cleaned }));
+    } else {
+      setData((prev) => ({ ...prev, [name]: value }));
+    }
+
   }
   
   const onSelectChange = (value: string) => {
     setData((prev) => ({ ...prev, category: value }));
   };
 
+  const formatRupiah = (value: string) => {
+    const cleaned = value.replace(/\D/g, ""); // hanya angka
+    if (!cleaned) return "";
+    return new Intl.NumberFormat("id-ID").format(parseInt(cleaned));
+  };
 
   // useEffect(()=>{
   //   console.log(data);
@@ -80,6 +97,7 @@ const onDrop = (acceptedFiles: File[]) => {
     formData.append("price", data.price)
     formData.append("stock", data.stock)
     formData.append("description", data.description)
+    formData.append("inStock", data.inStock.toString())
     files.forEach((file) => {
       formData.append("image", file);
     })
@@ -91,6 +109,7 @@ const onDrop = (acceptedFiles: File[]) => {
         price: "",
         stock: "",
         description: "",
+        inStock: true,
       })
       setFiles([])
       toast.success(response.data.message)
@@ -122,11 +141,12 @@ const onDrop = (acceptedFiles: File[]) => {
                 onChange={onSelectChange}
                 className="dark:bg-dark-900"
                 name="category"
+                value={data.category}
             />
             </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
             <div>
             <Label htmlFor="tm">Harga Produk</Label>
             <div className="relative">
@@ -136,7 +156,7 @@ const onDrop = (acceptedFiles: File[]) => {
                 className="pl-[62px]"
                 name="price"
                 onChange={onChangeHandler}
-                value={data.price}
+                value={formatRupiah(data.price)}
                 />
                 <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
                 Rp
@@ -154,6 +174,22 @@ const onDrop = (acceptedFiles: File[]) => {
             
             />
             </div>
+            <div>
+            <Label htmlFor="stock">Available</Label>
+            <Switch
+              label={data.inStock ? "Active" : "Not Active"}
+              defaultChecked={true}
+              name="inStock"
+
+              onChange={(checked, name) => {
+                if (name) {
+                  setData((prev) => ({ ...prev, [name]: checked }));
+                }
+              }}
+            />
+            
+            </div>
+            
         </div>
          
         <div>
@@ -169,7 +205,7 @@ const onDrop = (acceptedFiles: File[]) => {
     </div>
     <div className="transition border border-gray-300 border-dashed cursor-pointer dark:hover:border-brand-500 dark:border-gray-700 rounded-xl hover:border-brand-500">
     {files.length === 0 ? (
-        <form
+        <div
           {...getRootProps()}
           className={`dropzone rounded-xl border-dashed border-gray-300 p-7 lg:p-10 ${
             isDragActive
@@ -215,7 +251,7 @@ const onDrop = (acceptedFiles: File[]) => {
             </span>
           </div>
           </div>
-          </form>
+          </div>
           ) : (
 
             <div className="mt-4 flex gap-4 items-center justify-center">

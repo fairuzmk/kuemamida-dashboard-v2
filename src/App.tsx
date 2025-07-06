@@ -20,13 +20,24 @@ import AddProduct from "./pages/AddProduct/AddProduct";
 import ListProduct from "./pages/ListProduct/ListProduct";
 import OrderPage from "./pages/Order/OrderPage";
 import { ToastContainer} from 'react-toastify';
+import EditProduct from "./pages/EditProduct/EditProduct";
+import { UrlContext } from "./context/UrlContext";
+import AddCustomProduct from "./pages/AddCustomProduct/AddCustomProduct";
+import ListCustomProduct from "./pages/ListCustomProduct/ListCustomProduct";
+import InvoiceCustom from "./pages/InvoiceCustom/InvoiceCustom";
+import EditCustomProduct from "./pages/EditCustomProduct/EditCustomProduct";
 
 export default function App() {
+  
+  const urlServer = "http://localhost:4000";
+
   return (
+    
     <>
+    <UrlContext.Provider value={urlServer}>
       <Router>
         <ScrollToTop />
-        <ToastContainer/>
+        <ToastContainer position="bottom-right"/>
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
@@ -34,12 +45,28 @@ export default function App() {
 
             {/* Add Products */}
             <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/add-custom-product" element={<AddCustomProduct />} />
             
+            {/* Edit Products */}
+            <Route path="/edit-product/:id" element={<EditProduct />} />
+            <Route path="/edit-custom-product/:id" element={<EditCustomProduct />} />
+
             {/* List Products */}
-            <Route path="/list-product" element={<ListProduct/>} />
+            <Route path="/list-product" element={<ListProduct />} />
+            <Route path="/list-custom-product" element={<ListCustomProduct />} />
+            <Route path="/invoice-custom/:id" element={<InvoiceCustom />} />
+            <Route path="/data-custom-order" element={<ListProduct />} />
 
             {/* Orders */}
             <Route path="/orders" element={<OrderPage/>} />
+
+
+
+
+
+
+
+
 
             {/* Others Page */}
             <Route path="/profile" element={<UserProfiles />} />
@@ -70,6 +97,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
+      </UrlContext.Provider>
     </>
   );
 }
