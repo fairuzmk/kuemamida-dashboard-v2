@@ -26,7 +26,7 @@ import { useUrl } from "../../context/UrlContext";
     const [list, setList] = useState<Array<{
         _id: string;
         customerName: string;
-        additionalImages: string;
+        additionalImages: any;
         phone: string;
         description: string;
         basePrice: number;
@@ -46,10 +46,13 @@ import { useUrl } from "../../context/UrlContext";
         status: string;
         createdAt: Date;
     }>>([]);
-  
+    const [loading, setLoading] = useState(false)
+
     const fetchList = async () => {
-      const response = await axios.get(`${url}/api/custom-order/list`);
-      console.log(response.data)
+      setLoading(true)
+      try {
+        const response = await axios.get(`${url}/api/custom-order/list`);
+      
       if (response.data.success){
         const parsedData = response.data.data.map((item: any) => ({
             ...item,
@@ -59,8 +62,14 @@ import { useUrl } from "../../context/UrlContext";
         setList(parsedData)
       }
       else{
-        toast.error("Error")
+        toast.error("Database Error")
       }
+      } catch (error) {
+        toast.error("Database Error")
+      } finally {
+        setLoading(false);
+      }
+      
     }
 
     const editFood = async(foodId:string) => {
@@ -118,26 +127,31 @@ import { useUrl } from "../../context/UrlContext";
       };
 
       const statusList = [
-        { value: "pending", label: "Pending" },
-        { value: "confirmed", label: "Dikonfirmasi" },
-        { value: "in-progress", label: "Dalam Progress" },
-        { value: "completed", label: "Selesai" },
-        { value: "cancelled", label: "Dibatalkan" },
+        { value: "Pending", label: "Pending" },
+        { value: "Confirmed", label: "Dikonfirmasi" },
+        { value: "In-progress", label: "Dalam Progress" },
+        { value: "Completed", label: "Selesai" },
+        { value: "Cancelled", label: "Dibatalkan" },
     
       ];
       
       // Mapping status ke warna yang sesuai
       const statusColorMap: Record<string, BadgeColor> = {
-        pending: "warning",
-        confirmed: "primary",
-        "in-progress": "info",
-        completed: "success",
-        cancelled: "error", // ganti dari destructive ke error sesuai BadgeColor
+        Pending: "warning",
+        Confirmed: "primary",
+        "In-progress": "info",
+        Completed: "success",
+        Cancelled: "error", // ganti dari destructive ke error sesuai BadgeColor
       };
 
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
         <div className="max-w-full overflow-x-auto">
+        {loading ? (
+            <div className="p-6 text-center text-gray-500 dark:text-gray-300">
+              Fetch data from database...
+            </div>
+            ) : (  
           <Table>
             {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
@@ -189,7 +203,7 @@ import { useUrl } from "../../context/UrlContext";
               </TableRow>
             </TableHeader>
   
-            {/* Table Body */}
+                    
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {list.map((item, index) => (
                 <TableRow key={index}>
@@ -199,7 +213,9 @@ import { useUrl } from "../../context/UrlContext";
                         <img
                           width={40}
                           height={40}
-                          src={`${url}/images/custom/`+item.additionalImages}
+                          src={typeof item.additionalImages === "string" 
+                            ? item.additionalImages 
+                            : item.additionalImages?.url}
                           
                         />
                       </div>
@@ -257,7 +273,9 @@ import { useUrl } from "../../context/UrlContext";
                 </TableRow>
               ))}
             </TableBody>
+          
           </Table>
+          )}
         </div>
       </div>
     );

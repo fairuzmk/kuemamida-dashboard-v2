@@ -43,11 +43,11 @@ export default function EditCustomComponent() {
   });
 
   const statusList = [
-    { value: "pending", label: "Pending" },
-    { value: "confirmed", label: "Dikonfirmasi" },
-    { value: "in-progress", label: "Dalam Progress" },
-    { value: "completed", label: "Selesai" },
-    { value: "cancelled", label: "Dibatalkan" },
+    { value: "Pending", label: "Pending" },
+    { value: "Confirmed", label: "Dikonfirmasi" },
+    { value: "In-progress", label: "Dalam Progress" },
+    { value: "Completed", label: "Selesai" },
+    { value: "Cancelled", label: "Dibatalkan" },
   ];
 
   const pilihanDiameter = [
@@ -59,9 +59,9 @@ export default function EditCustomComponent() {
   ];
 
   const pilihanBentuk = [
-    { value: "round", label: "Bulat" },
-    { value: "square", label: "Kotak" },
-    { value: "custom", label: "Custom" },
+    { value: "Round", label: "Bulat" },
+    { value: "Square", label: "Kotak" },
+    { value: "Custom", label: "Custom" },
   ];
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -133,9 +133,11 @@ export default function EditCustomComponent() {
     setSelectedStatus(value);
     setData((prev) => ({ ...prev, status: value }));
   };
+  const [loading, setLoading] = useState(false);
 
   const onSubmitHandler = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData();
     formData.append("id", id!); // <-- kirim ID produk
     formData.append("customerName", data.customerName)
@@ -172,6 +174,8 @@ export default function EditCustomComponent() {
       }
     } catch {
       toast.error("Terjadi kesalahan saat menyimpan");
+    } finally {
+      setLoading(false); // selesai loading
     }
   };
 
@@ -304,7 +308,8 @@ export default function EditCustomComponent() {
             </div>
           )}
         </div>
-        <Button variant="primary">Simpan Perubahan</Button>
+        <Button variant="primary" size="md" disabled={loading}
+        >{loading?"Updating..":"Update Product"}</Button>
       </form>
     </ComponentCard>
   );

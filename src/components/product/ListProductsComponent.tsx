@@ -31,16 +31,26 @@ import { useUrl } from "../../context/UrlContext";
       inStock: boolean;
       price: number;
     }>>([]);
-  
+    
+    const [loading, setLoading] = useState(true);
+
     const fetchList = async () => {
-      const response = await axios.get(`${url}/api/food/list`);
-      console.log(response.data)
+      setLoading(true);
+      try {
+        const response = await axios.get(`${url}/api/food/list`);
+      
       if (response.data.success){
         setList(response.data.data)
       }
       else{
-        toast.error("Error")
+        toast.error("Database Error")
+      } 
+      } catch (error) {
+        toast.error("Database Error")
+      } finally {
+        setLoading(false);
       }
+      
     }
 
     const editFood = async(foodId:string) => {
@@ -82,7 +92,16 @@ import { useUrl } from "../../context/UrlContext";
 
     return (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+        
         <div className="max-w-full overflow-x-auto">
+          
+        {loading ? (
+            
+            <div className="p-6 text-center text-gray-500 dark:text-gray-300">
+              Fetch data from database...
+            </div> )
+ 
+            : ( 
           <Table>
             {/* Table Header */}
             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
@@ -125,9 +144,7 @@ import { useUrl } from "../../context/UrlContext";
                 </TableCell>
               </TableRow>
             </TableHeader>
-  
-            {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {list.map((item, index) => (
                 <TableRow key={index}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
@@ -136,7 +153,7 @@ import { useUrl } from "../../context/UrlContext";
                         <img
                           width={40}
                           height={40}
-                          src={`${url}/images/`+item.image}
+                          src={item.image}
                           
                         />
                       </div>
@@ -175,7 +192,9 @@ import { useUrl } from "../../context/UrlContext";
                 </TableRow>
               ))}
             </TableBody>
+            
           </Table>
+          )}
         </div>
       </div>
     );

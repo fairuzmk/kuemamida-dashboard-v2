@@ -87,7 +87,7 @@ export default function EditProductComponent() {
           description: product.description,
           inStock: !!product.inStock,
         });
-        setPreviewImage(`${url}/images/${product.image}`);
+        setPreviewImage(product.image);
       }
     } catch (err) {
       toast.error("Gagal mengambil data produk");
@@ -108,8 +108,12 @@ export default function EditProductComponent() {
     setData((prev) => ({ ...prev, category: value }));
   };
 
+
+  const [loading, setLoading] = useState(false);
+
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData();
     formData.append("id", id!); // <-- kirim ID produk
     formData.append("name", data.name);
@@ -134,6 +138,8 @@ export default function EditProductComponent() {
       }
     } catch (err) {
       toast.error("Terjadi kesalahan saat menyimpan");
+    } finally {
+      setLoading(false); // selesai loading
     }
   };
 
@@ -213,8 +219,8 @@ export default function EditProductComponent() {
             <p className="text-sm text-gray-600 text-center">Drag & drop atau klik untuk upload gambar baru</p>
           </div>
 
-          <Button size="md" variant="primary">
-            Simpan Perubahan
+          <Button size="md" variant="primary" disabled={loading}>
+            {loading?"Updating...":"Update Produk"}
           </Button>
         </div>
       </form>

@@ -49,19 +49,19 @@ const onDrop = (acceptedFiles: File[]) => {
   ];
 
   const pilihanBentuk = [
-    { value: "round", label: "Bulat" },
-    { value: "square", label: "Kotak" },
-    { value: "custom", label: "custom" },
+    { value: "Round", label: "Bulat" },
+    { value: "Square", label: "Kotak" },
+    { value: "Custom", label: "custom" },
 
   ];
 
 
   const statusList = [
-    { value: "pending", label: "Pending" },
-    { value: "confirmed", label: "Dikonfirmasi" },
-    { value: "in-progress", label: "Dalam Progress" },
-    { value: "completed", label: "Selesai" },
-    { value: "cancelled", label: "Dibatalkan" },
+    { value: "Pending", label: "Pending" },
+    { value: "Confirmed", label: "Dikonfirmasi" },
+    { value: "In-progress", label: "Dalam Progress" },
+    { value: "Completed", label: "Selesai" },
+    { value: "Cancelled", label: "Dibatalkan" },
 
   ];
 
@@ -163,8 +163,10 @@ const onDrop = (acceptedFiles: File[]) => {
   //   console.log(data);
   // }, [data])
 
+  const [loading, setLoading] = useState(false);
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true)
     const formData = new FormData();
     formData.append("customerName", data.customerName)
     formData.append("phone", data.phone)
@@ -186,16 +188,15 @@ const onDrop = (acceptedFiles: File[]) => {
     formData.append("status", data.status)
     formData.append("createdAt", data.createdAt)
    
-    files.forEach((file) => {
-      formData.append("additionalImages", file);
-    })
+    formData.append("additionalImages", files[0]);
 
       // 🔍 Cetak ke console DEBUG
       // console.log("==== FormData Preview ====");
       // for (const [key, value] of formData.entries()) {
       //   console.log(key, value);
       // }
-    const response = await axios.post(`${url}/api/custom-order/add`, formData); //kirim data ke backend
+    try {
+      const response = await axios.post(`${url}/api/custom-order/add`, formData); //kirim data ke backend
 
     if (response.data.success){
       setData({
@@ -227,6 +228,12 @@ const onDrop = (acceptedFiles: File[]) => {
     else{
       toast.error(response.data.message)
     }
+    } catch (error) {
+      toast.error("Terjadi kesalahan saat menyimpan");
+    } finally {
+      setLoading(false); // selesai loading
+    }
+    
   }
 
   return (
@@ -562,10 +569,10 @@ const onDrop = (acceptedFiles: File[]) => {
        <Button
               size="md"
               variant="primary"
-              
+              disabled={loading}
               
             >
-              Tambah Produk
+              {loading?"Uploading..":"Tambah Produk"}
             </Button>
        
       </div>

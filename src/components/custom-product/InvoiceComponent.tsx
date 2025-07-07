@@ -184,7 +184,9 @@ BCA 8010763836 a.n. Dini Rizkita Sari
               <div className="w-48 flex-shrink-0 text-center mx-auto md:mx-0">
                 <div className="w-full h-48 border rounded-md overflow-hidden ">
                   <img
-                    src={`${url}/images/custom/${data.additionalImages}`}
+                    src={typeof data.additionalImages === "string" 
+                      ? data.additionalImages 
+                      : data.additionalImages?.url}
                     alt="Gambar Kue"
                     className="w-full h-full object-cover"
                     crossOrigin="anonymous"
@@ -226,31 +228,33 @@ BCA 8010763836 a.n. Dini Rizkita Sari
             readOnly
           />
 
+        <div className="flex flex-col items-center gap-4 mt-4 lg:flex-row lg:justify-start">           
+          <div className="mt-4 ">
           <button
             onClick={() => {
               navigator.clipboard.writeText(formatWA(data));
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
-            className="mt-3 px-4 py-2 mr-5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white text-md rounded hover:bg-blue-700"
           >
-            📋 Copy ke Clipboard
+            Copy ke Clipboard
           </button>
-
+          </div>
+          <div className="mt-4">
           <a
-            href={`https://web.whatsapp.com/send?phone=${data.phone.replace(/^0/, "62")}&text=${encodeURIComponent(formatWA(data))}`}
+            href={`https://wa.me/${data.phone.replace(/^0/, "62")}?text=${encodeURIComponent(formatWA(data))}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 bg-green-500 text-white text-sm rounded hover:bg-green-600"
+            className="px-4 py-3 bg-green-500 text-white text-md rounded hover:bg-green-600"
             >
-            📤 Kirim via WhatsApp
-            </a>
+            Kirim via WhatsApp
+          </a>
+          </div>
           
-
-
-          {copied && <p className="text-green-600 text-sm mt-2">✅ Teks berhasil disalin!</p>}
         </div>
-        
+        {copied && <p className="text-green-600 text-sm mt-2">✅ Teks berhasil disalin!</p>}
+        </div>   
       </div>
     </div>
   );

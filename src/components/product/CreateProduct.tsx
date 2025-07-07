@@ -89,8 +89,12 @@ const onDrop = (acceptedFiles: File[]) => {
   //   console.log(data);
   // }, [data])
 
+  const [loading, setLoading] = useState(false);
+
+
   const onSubmitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true); // mulai loading
     const formData = new FormData();
     formData.append("name", data.name)
     formData.append("category", data.category)
@@ -98,25 +102,31 @@ const onDrop = (acceptedFiles: File[]) => {
     formData.append("stock", data.stock)
     formData.append("description", data.description)
     formData.append("inStock", data.inStock.toString())
-    files.forEach((file) => {
-      formData.append("image", file);
-    })
-    const response = await axios.post(`${url}/api/food/add`, formData);
-    if (response.data.success){
-      setData({
-        name: "",
-        category: "",
-        price: "",
-        stock: "",
-        description: "",
-        inStock: true,
-      })
-      setFiles([])
-      toast.success(response.data.message)
+    formData.append("image", files[0]);
+
+    try {
+      const response = await axios.post(`${url}/api/food/add`, formData);
+      if (response.data.success){
+        setData({
+          name: "",
+          category: "",
+          price: "",
+          stock: "",
+          description: "",
+          inStock: true,
+        })
+        setFiles([])
+        toast.success(response.data.message)
+      }
+      else{
+        toast.error(response.data.message)
+      }
+    } catch (error) {
+      toast.error("Error")
+    } finally {
+      setLoading(false)
     }
-    else{
-      toast.error(response.data.message)
-    }
+    
   }
 
   return (
@@ -282,13 +292,12 @@ const onDrop = (acceptedFiles: File[]) => {
 
          
        <Button
-              size="md"
-              variant="primary"
-              
-              
-            >
-              Tambah Produk
-            </Button>
+        size="md"
+        variant="primary"
+        disabled={loading}
+      > {loading ? "Mengunggah..." : "Tambah Produk"}
+
+      </Button>
        
       </div>
     </form>
