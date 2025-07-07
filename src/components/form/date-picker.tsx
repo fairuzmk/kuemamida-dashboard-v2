@@ -5,7 +5,6 @@ import Label from "./Label";
 import { CalenderIcon } from "../../icons";
 import Hook = flatpickr.Options.Hook;
 import DateOption = flatpickr.Options.DateOption;
-import { Options } from "flatpickr/dist/types/options";
 
 type PropsType = {
   id: string;

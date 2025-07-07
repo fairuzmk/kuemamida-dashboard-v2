@@ -8,14 +8,13 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  PaperPlaneIcon,
+
 
   UserCircleIcon,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import { FaShippingFast, FaBirthdayCake } from "react-icons/fa";
 import { IoFastFood } from "react-icons/io5";
-import { MdOutlineLibraryAdd } from "react-icons/md";
 
 type NavItem = {
   name: string;

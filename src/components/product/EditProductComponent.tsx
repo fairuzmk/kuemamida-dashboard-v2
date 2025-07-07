@@ -43,7 +43,7 @@ export default function EditProductComponent() {
     setPreviewImage(null); // <-- jika user upload baru, hilangkan preview lama
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: {
       "image/png": [],

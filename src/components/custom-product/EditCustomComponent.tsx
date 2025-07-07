@@ -259,7 +259,7 @@ export default function EditCustomComponent() {
             label="Tanggal Penjemputan"
             placeholder="Pilih tanggal"
             value={data.pickupDate || undefined}
-            onChange={(selectedDates, dateStr) => {
+            onChange={(_, dateStr) => {
               setData((prev) => ({ ...prev, pickupDate: dateStr })); // langsung simpan string dari flatpickr
             }}
             
