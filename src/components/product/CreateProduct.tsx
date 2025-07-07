@@ -19,7 +19,7 @@ import { useUrl } from "../../context/UrlContext";
 export default function CreateProduct() {
 
 
-const url = useUrl
+const url = useUrl()
 const [files, setFiles] = useState<File[]>([]);
 
 const onDrop = (acceptedFiles: File[]) => {
