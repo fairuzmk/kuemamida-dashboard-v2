@@ -40,8 +40,10 @@ import { useUrl } from "../../context/UrlContext";
         writingOnCake: string;
         topper: string;
         topperPrice: number;
-        addOn: string;
-        addOnPrice: string;
+        addOns: Array<{
+          addOn: string;
+          addOnPrice: number;
+        }>;
         pickupDate: Date;
         status: string;
         createdAt: Date;
@@ -243,6 +245,11 @@ import { useUrl } from "../../context/UrlContext";
                         <span className="block font-small text-gray-700 text-theme-sm dark:text-white/90">
                           Topper : {item.topper}
                         </span>
+                        {item.addOns.map((addOn, index) => (
+                        <span key={index}>
+                          {addOn.addOn}, 
+                        </span>
+                      ))}
                   </TableCell>
 
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">

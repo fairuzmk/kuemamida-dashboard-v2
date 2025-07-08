@@ -11,6 +11,8 @@ import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useUrl } from "../../context/UrlContext";
+import { FaTrash } from "react-icons/fa";
+import { MdOutlinePlaylistAdd } from "react-icons/md";
 
 
 export default function EditCustomComponent() {
@@ -35,12 +37,17 @@ export default function EditCustomComponent() {
     writingOnCake: "",
     topper: "",
     topperPrice: 0,
-    addOn: "",
-    addOnPrice: 0,
+    totalAddOn: 0,
     pickupDate: "",
     status: "",
     createdAt: new Date().toISOString(),
   });
+  type AddOnType = {
+    addOn: string;
+    addOnPrice: number;
+  };
+
+  const [addOns, setAddOns] = useState<AddOnType[]>([{ addOn: "", addOnPrice: 0 }]);
 
   const statusList = [
     { value: "Pending", label: "Pending" },
@@ -86,7 +93,14 @@ export default function EditCustomComponent() {
           ...fetched,
           createdAt: new Date(fetched.createdAt).toISOString(),
         });
-        setSelectedStatus(fetched.status || "pending");
+
+        setSelectedStatus(fetched.status || "Pending");
+        setAddOns(
+          Array.isArray(fetched.addOns) && fetched.addOns.length > 0
+            ? fetched.addOns
+            : [{ addOn: "", addOnPrice: 0 }]
+        );
+        console.log(fetched);
       } else {
         toast.error("Gagal mengambil data");
       }
@@ -95,9 +109,33 @@ export default function EditCustomComponent() {
     }
   };
 
+
+
   useEffect(() => {
     if (id) fetchData();
   }, [id]);
+
+
+  const handleAddOnChange = (
+    index: number,
+    field: keyof AddOnType,
+    value: string | number
+  ) => {
+    const newAddOns = [...addOns];
+    newAddOns[index] = {
+      ...newAddOns[index],
+      [field]: field === "addOnPrice" ? Number(value) : value as string,
+    };
+    setAddOns(newAddOns);
+  };
+  
+  const handleAddAddOn = () => {
+    setAddOns([...addOns, { addOn: "", addOnPrice: 0 }]);
+  };
+
+  const handleRemoveAddOn = (index: number) => {
+    setAddOns((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -120,14 +158,14 @@ export default function EditCustomComponent() {
     }
   };
 
-  const calculateTotalPrice = (base: number, addOn: number, topper: number) => base + addOn + topper;
 
   useEffect(() => {
-    setData((prev) => ({
-      ...prev,
-      totalPrice: calculateTotalPrice(prev.basePrice, prev.addOnPrice, prev.topperPrice),
-    }));
-  }, [data.basePrice, data.addOnPrice, data.topperPrice]);
+    const totalAddOnPrice = addOns.reduce((sum, item) => sum + item.addOnPrice, 0);
+    setData((prev) => ({ ...prev, totalAddOn: totalAddOnPrice }));
+    const total = data.basePrice + data.topperPrice + totalAddOnPrice;
+    setData((prev) => ({ ...prev, totalPrice: total }));
+  }, [data.basePrice, data.topperPrice, addOns]);
+
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -150,19 +188,19 @@ export default function EditCustomComponent() {
     formData.append("cakeFlavor", data.cakeFlavor)
     formData.append("krimFlavor", data.krimFlavor)
     formData.append("filling", data.filling)
+    formData.append("totalAddOn", data.totalAddOn.toString())
     formData.append("themeColor", data.themeColor)
     formData.append("writingOnCake", data.writingOnCake)
     formData.append("topper", data.topper)
     formData.append("topperPrice", data.topperPrice.toString())
-    formData.append("addOn", data.addOn)
-    formData.append("addOnPrice", data.addOnPrice.toString())
+
     formData.append("pickupDate", data.pickupDate)
     formData.append("status", data.status)
     formData.append("createdAt", data.createdAt)
     if (files.length > 0) {
         formData.append("additionalImages", files[0]);
       }
-    
+    formData.append("addOns", JSON.stringify(addOns));
 
     try {
       const res = await axios.post(`${url}/api/custom-order/edit`, formData);
@@ -238,7 +276,9 @@ export default function EditCustomComponent() {
             <Input name="writingOnCake" value={data.writingOnCake} onChange={onChangeHandler} />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-6">
+
+        {/* <div className="grid grid-cols-2 gap-6">
+          
           <div>
             <Label>Topper</Label>
             <Input name="topper" value={data.topper} onChange={onChangeHandler} />
@@ -247,17 +287,84 @@ export default function EditCustomComponent() {
             <Label>Harga Topper</Label>
             <Input type="number" name="topperPrice" value={data.topperPrice} onChange={onChangeHandler} />
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <Label>Add On</Label>
-            <Input name="addOn" value={data.addOn} onChange={onChangeHandler} />
+        </div> */}
+
+
+        
+          <div className="space-y-4">
+            <Label>Topper dan Lainnya (Add On)</Label>
+            {addOns.map((item, index) => (
+              <>
+
+              <div key={index} className="grid gridcols-1 md:grid-cols-2 gap-4 items-start">
+                <div>
+                  <Input
+                    type="text"
+                    placeholder="Nama Add On"
+                    value={item.addOn}
+                    onChange={(e) => handleAddOnChange(index, "addOn", e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="relative w-full">
+                    <Input
+                      type="number"
+                      placeholder="Harga Add On"
+                      className="pl-[62px]"
+                      value={item.addOnPrice}
+                      onChange={(e) => handleAddOnChange(index, "addOnPrice", e.target.value)}
+                    />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 px-3 py-2 border-r">
+                      Rp
+                    </span>
+                  </div>
+
+                  {addOns.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveAddOn(index)}
+                      className="text-white text-sm bg-red-400 px-3 py-3 rounded-md"
+                    >
+                      <FaTrash/>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleAddAddOn}
+                    className="my-2 px-2.5 py-2.5 bg-blue-500 text-lg text-white rounded-md hover:bg-blue-600"
+                  >
+                    <MdOutlinePlaylistAdd />
+                  </button>
+                </div>
+
+              </div>
+
+              <div className="border-t-1 border-dashed border-gray-400 my-3"/>
+              
+              </>
+            ))}
+            </div>
+
+        
+        <div>
+            <Label htmlFor="tm">Total Harga AddOn</Label>
+            <div className="relative">
+                <Input
+                type="number"
+                placeholder="Total Add On Produk"
+                className="pl-[62px]"
+                name="totalAddOn"
+                onChange={onChangeHandler}
+                value={data.totalAddOn}
+                disabled
+                />
+                <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
+                Rp
+                </span>
+            </div>
           </div>
-          <div>
-            <Label>Harga Add On</Label>
-            <Input type="number" name="addOnPrice" value={data.addOnPrice} onChange={onChangeHandler} />
-          </div>
-        </div>
+
         <DatePicker
             id="pickupDate"
             label="Tanggal Penjemputan"

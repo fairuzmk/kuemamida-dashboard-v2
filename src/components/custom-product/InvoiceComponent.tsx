@@ -15,12 +15,27 @@ const InvoiceComponent = () => {
     const fetchInvoice = async () => {
       const response = await axios.get(`${url}/api/custom-order/list`);
       if (response.data.success) {
+        const allOrders = response.data.data.sort(
+          (a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        const currentIndex = allOrders.findIndex((d: any) => d._id === id) + 1;
+
         const item = response.data.data.find((d: any) => d._id === id);
         if (item) {
+
+          const pickupDate = new Date(item.pickupDate);
+          const createdAt = new Date(item.createdAt);
+  
+          const invoiceNumber = String(currentIndex).padStart(4, '0');
+          const invoiceMonth = String(createdAt.getMonth() + 1).padStart(2, '0');
+          const invoiceYear = createdAt.getFullYear();
+          const invoiceCode = `INV-${invoiceNumber}-${invoiceMonth}-${invoiceYear}`;
+  
           setData({
             ...item,
-            pickupDate: new Date(item.pickupDate),
+            pickupDate: pickupDate,
             createdAt: new Date(item.createdAt),
+            invoiceCode,
           });
         } else {
           console.error("Data tidak ditemukan");
@@ -29,6 +44,8 @@ const InvoiceComponent = () => {
     };
     fetchInvoice();
   }, [id]);
+
+  
 
   const formatDate = (date: Date) => {
     const dd = String(date.getDate()).padStart(2, "0");
@@ -79,6 +96,12 @@ const InvoiceComponent = () => {
   };
 
   const formatWA = (data: any) => {
+    const addOnList = data.addOns
+    .map(
+      (item: { addOn: string; addOnPrice: number }, index: number) =>
+        `${index + 1}. ${item.addOn} + ${formatRupiah(item.addOnPrice)}`
+    )
+    .join('\n');
     return `*Invoice Pemesanan Kue Mamida 🍰*\n
 *Nama Pemesan:* ${data.customerName}
 *No HP:* ${data.phone}
@@ -89,10 +112,12 @@ const InvoiceComponent = () => {
 *Ukuran:* ${data.cakeShape} | ${data.cakeSize} cm
 *Rasa:* ${data.cakeFlavor} | Krim: ${data.krimFlavor} | Selai: ${data.filling}
 *Tulisan:* ${data.writingOnCake}
-*Status:* ${data.status}
+*Topper: * 
+${addOnList}
 -----------------------------
-*Topper:* ${data.topper} + ${formatRupiah(data.topperPrice)}
-*Add-on:* ${data.addOn} + ${formatRupiah(data.addOnPrice)}
+Rincian Harga: 
+Harga Kue : ${formatRupiah(data.basePrice)}
+Topping : ${formatRupiah(data.totalAddOn)}
 
 *Total Pesanan:* ${formatRupiah(data.totalPrice)}
 ------------------------------
@@ -117,9 +142,9 @@ BCA 8010763836 a.n. Dini Rizkita Sari
             className="bg-white shadow-md rounded-lg p-6 border overflow-visible"
             style={{ backgroundColor: "#fff", color: "#000" }}
           >
-            <div className="flex flex-col-reverse md:flex-row md:items-start md:justify-between mb-6">
-              <h2 className="text-2xl font-bold text-center lg:text-left md:text-4xl md:text-center mt-6">Rekap Pesanan</h2>
-              <div className="w-40 h-auto flex-shrink-0 overflow-visible mx-auto md:mx-0">
+            <div className="flex flex-col-reverse mb-2 md:mb-6 md:flex-row md:items-start md:justify-between ">
+              <h2 className="text-2xl font-bold text-center lg:text-left md:text-4xl md:text-center md:mt-6">Rekap Pesanan</h2>
+              <div className="w-25 md:w-40 md:h-auto flex-shrink-0 overflow-visible mx-auto md:mx-0">
                 <img
                   src="/images/logo/mamidalogo.png"
                   alt="Logo Mamida"
@@ -130,8 +155,7 @@ BCA 8010763836 a.n. Dini Rizkita Sari
             </div>
 
             <div className="mb-4 mt-10">
-              <p><strong>Invoice #:</strong> {data._id}</p>
-              <p><strong>Tanggal Order:</strong> {formatDate(data.createdAt)}</p>
+              <p><strong>Invoice #:</strong>  {data.invoiceCode}</p>              
               <p><strong>Tanggal Diambil:</strong> {formatDate(data.pickupDate)}</p>
               <p><strong>Pelanggan:</strong> {data.customerName}</p>
               <p><strong>No HP:</strong> {data.phone}</p>
@@ -161,17 +185,20 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                     </tr>
                     
                     <tr>
-                      <td className="py-1 font-medium">Topper</td>
-                      <td className="py-1">{data.topper} <span className="font-bold" style={{ color: "#065f46" }}>+ {formatRupiah(data.topperPrice)}</span></td>
+                      <td className="py-1 font-medium align-top">Add Ons</td>
+                      <td className="py-1">
+                        {data.addOns.map((item: { addOn: string; addOnPrice: number }, index: number) => (
+                          <div key={index}>
+                            {index + 1}. {item.addOn}{" "}
+                            <span className="font-bold" style={{ color: "#065f46" }}>
+                              + {formatRupiah(item.addOnPrice)}
+                            </span>
+                          </div>
+                        ))}
+                      </td>
                     </tr>
-                    <tr>
-                      <td className="py-1 font-medium">Add-on</td>
-                      <td className="py-1">{data.addOn} <span className="font-bold" style={{ color: "#065f46" }}>+ {formatRupiah(data.addOnPrice)}</span></td>
-                    </tr>
-                    <tr>
-                      <td className="py-1 font-medium">Status</td>
-                      <td className="py-1">{data.status}</td>
-                    </tr>
+                    
+                    
                   </tbody>
                 </table>
 

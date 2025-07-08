@@ -21,6 +21,7 @@
     "apexcharts": "^4.1.0",
     "axios": "^1.10.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.0.1",
     "flatpickr": "^4.6.13",
     "html2canvas": "^1.4.1",
     "react": "^19.0.0",
