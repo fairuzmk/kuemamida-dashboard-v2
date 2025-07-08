@@ -32,9 +32,9 @@ import EditCustomProduct from "./pages/EditCustomProduct/EditCustomProduct";
 
 export default function App() {
   
-  const urlServer = "http://localhost:4000";
+  //const urlServer = "http://localhost:4000";
 
-  // const urlServer = "https://kuemamida-backend.onrender.com";
+ const urlServer = "https://kuemamida-backend.onrender.com";
 
   return (
     
