@@ -13,6 +13,8 @@ import axios from "axios"
 import { toast } from "react-toastify";
 import Switch from "../form/switch/Switch";
 import { useUrl } from "../../context/UrlContext";
+import { FaTrash } from "react-icons/fa";
+import { MdOutlinePlaylistAdd } from "react-icons/md";
 
 
 
@@ -59,7 +61,38 @@ const onDrop = (acceptedFiles: File[]) => {
       inStock: true,
   })
 
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    type VariansType = {
+    varianName: string;
+    varianPrice: number;
+    varianStock: number;
+  };
+
+  const [varians, setVarians] = useState<VariansType[]>([{ varianName: "", varianPrice: 0, varianStock:0, }]);
+
+
+  const handleVarianChange = (
+    index: number,
+    field: keyof VariansType,
+    value: string | number | number
+  ) => {
+    const newVarians = [...varians];
+    newVarians[index] = {
+      ...newVarians[index],
+      [field]: ["varianPrice", "varianStok"].includes(field) ? Number(value) : value as string,
+    };
+    setVarians(newVarians);
+  };
+
+  const handleAddVarian = () => {
+    setVarians([...varians, { varianName: "", varianPrice: 0, varianStock: 0, }]);
+  };
+
+  const handleRemoveVarian = (index: number) => {
+    setVarians((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  
+const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
     setData(data=>({...data, [name]:value}))
@@ -103,6 +136,7 @@ const onDrop = (acceptedFiles: File[]) => {
     formData.append("description", data.description)
     formData.append("inStock", data.inStock.toString())
     formData.append("image", files[0]);
+     formData.append("varians", JSON.stringify(varians));
 
     try {
       const response = await axios.post(`${url}/api/food/add`, formData);
@@ -115,6 +149,7 @@ const onDrop = (acceptedFiles: File[]) => {
           description: "",
           inStock: true,
         })
+        setVarians([{ varianName: "", varianPrice: 0, varianStock:0 }]);
         setFiles([])
         toast.success(response.data.message)
       }
@@ -202,6 +237,64 @@ const onDrop = (acceptedFiles: File[]) => {
             
         </div>
          
+        <div className="space-y-4">
+            <Label>Tambahkan Varian</Label>
+            {varians.map((item, index) => (
+              <>
+
+              <div key={index} className="grid gridcols-1 md:grid-cols-2 gap-4 items-start">
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Nama Add On"
+                      value={item.varianName}
+                      onChange={(e) => handleVarianChange(index, "varianName", e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-full">
+                      <Input
+                        type="number"
+                        placeholder="Harga Add On"
+                        className="pl-[62px]"
+                        value={item.varianPrice}
+                        onChange={(e) => handleVarianChange(index, "varianPrice", e.target.value)}
+                      />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 px-3 py-2 border-r">
+                        Rp
+                      </span>
+                    </div>
+                      {varians.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVarian(index)}
+                          className="text-white text-sm bg-red-400 px-3 py-3 rounded-md"
+                        >
+                          <FaTrash/>
+                        </button>
+                        
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleAddVarian}
+                        className="my-2 px-2.5 py-2.5 bg-blue-500 text-lg text-white rounded-md hover:bg-blue-600"
+                      >
+                        <MdOutlinePlaylistAdd />
+                      </button>
+                      
+                    </div>
+                  
+                </div>
+                <div className="border-t-1 border-dashed border-gray-400 my-3"/>
+                
+                </>
+              ))}
+
+          
+        </div>
+
+
         <div>
           <Label>Description</Label>
           <Input 

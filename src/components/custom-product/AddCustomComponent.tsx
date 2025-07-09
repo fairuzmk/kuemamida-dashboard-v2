@@ -488,7 +488,7 @@ const onDrop = (acceptedFiles: File[]) => {
             ))}
 
             
-          </div>
+            </div>
           </div>
 
           <div>
