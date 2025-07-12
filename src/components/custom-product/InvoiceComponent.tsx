@@ -104,9 +104,8 @@ const InvoiceComponent = () => {
     .join('\n');
     return `*Invoice Pemesanan Kue Mamida 🍰*\n
 *Nama Pemesan:* ${data.customerName}
-*No HP:* ${data.phone}
-*Tanggal Order:* ${formatDate(data.createdAt)}
 *Tanggal Diambil:* ${formatDate(data.pickupDate)}
+
 -----------------------------
 *Deskripsi:* ${data.description}
 *Ukuran:* ${data.cakeShape} | ${data.cakeSize} cm
@@ -115,11 +114,13 @@ const InvoiceComponent = () => {
 *Topper: * 
 ${addOnList}
 -----------------------------
+
 Rincian Harga: 
 Harga Kue : ${formatRupiah(data.basePrice)}
 Topping : ${formatRupiah(data.totalAddOn)}
 
 *Total Pesanan:* ${formatRupiah(data.totalPrice)}
+
 ------------------------------
 
 *Pembayaran*
@@ -140,11 +141,11 @@ BCA 8010763836 a.n. Dini Rizkita Sari
           <div
             ref={invoiceRef}
             className="bg-white shadow-md rounded-lg p-6 border overflow-visible"
-            style={{ backgroundColor: "#fff", color: "#000" }}
+            style={{ backgroundColor: "#fdfff7", color: "#000" }}
           >
             <div className="flex flex-col-reverse mb-2 md:mb-6 md:flex-row md:items-start md:justify-between ">
               <h2 className="text-2xl font-bold text-center lg:text-left md:text-4xl md:text-center md:mt-6">Rekap Pesanan</h2>
-              <div className="w-25 md:w-40 md:h-auto flex-shrink-0 overflow-visible mx-auto md:mx-0">
+              <div className="w-25 mb-5 md:w-40 md:h-auto flex-shrink-0 overflow-visible mx-auto md:mx-0">
                 <img
                   src="/images/logo/mamidalogo.png"
                   alt="Logo Mamida"
@@ -154,11 +155,23 @@ BCA 8010763836 a.n. Dini Rizkita Sari
               </div>
             </div>
 
-            <div className="mb-4 mt-10">
-              <p><strong>Invoice #:</strong>  {data.invoiceCode}</p>              
-              <p><strong>Tanggal Diambil:</strong> {formatDate(data.pickupDate)}</p>
-              <p><strong>Pelanggan:</strong> {data.customerName}</p>
-              <p><strong>No HP:</strong> {data.phone}</p>
+            <div className="mb-4 mt-5 md:mt-10">
+            <table className="w-full text-sm">
+              <tbody>
+                <tr>
+                  <td><p className="text-sm md:text-lg"><strong>Invoice ID :</strong>  </p> </td>
+                  <td className="text-right"><p className="text-sm md:text-lg">{data.invoiceCode}</p></td>
+                </tr>
+                <tr>
+                  <td><p className="text-sm md:text-lg"><strong>Pelanggan :</strong>  </p> </td>
+                  <td className="text-right"><p className="text-sm md:text-lg">{data.customerName}</p></td>
+                </tr>
+                <tr>
+                  <td><p className="text-sm md:text-lg"><strong>Tanggal Diambil : </strong>  </p> </td>
+                  <td className="text-right"><p className="text-sm md:text-lg">{formatDate(data.pickupDate)}</p></td>
+                </tr>
+              </tbody>
+            </table>
             </div>
 
             <div className="border-t-2 border-dashed border-gray-400 my-4" />
@@ -166,25 +179,25 @@ BCA 8010763836 a.n. Dini Rizkita Sari
             <div className="flex flex-col-reverse md:flex-row gap-6 mt-6">
               <div className="flex-1">
                 <table className="w-full text-sm">
-                  <tbody>
-                    <tr>
+                  <tbody className="text-sm md:text-lg">
+                    <tr className="">
                       <td className="py-1 font-medium">Deskripsi</td>
                       <td className="py-1">{data.description}</td>
                     </tr>
-                    <tr>
-                      <td className="py-1 font-medium">Bentuk | Ukuran</td>
+                    <tr className="">
+                      <td className="py-1 font-medium">Bentuk & Ukuran</td>
                       <td className="py-1">{data.cakeShape} | {data.cakeSize} cm</td>
                     </tr>
-                    <tr>
+                    <tr className="">
                       <td className="py-1 font-medium">Rasa</td>
                       <td className="py-1">{data.cakeFlavor} | Krim: {data.krimFlavor} | Selai: {data.filling}</td>
                     </tr>
-                    <tr>
+                    <tr className="">
                       <td className="py-1 font-medium">Tulisan</td>
                       <td className="py-1">{data.writingOnCake}</td>
                     </tr>
                     
-                    <tr>
+                    <tr className="">
                       <td className="py-1 font-medium align-top">Add Ons</td>
                       <td className="py-1">
                         {data.addOns.map((item: { addOn: string; addOnPrice: number }, index: number) => (
@@ -201,10 +214,10 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                     
                   </tbody>
                 </table>
+                
 
-                <div className="text-left mt-4">
-                  <p className="text-lg md:text-2xl font-bold">Total Pesanan: {formatRupiah(data.totalPrice)}</p>
-                </div>
+
+                
               </div>
 
               {/* Gambar Kue */}
@@ -221,13 +234,34 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                 </div>
                 <p className="text-sm text-gray-600 mb-2">Contoh Ilustrasi Kue</p>
               </div>
+              
             </div>
             <div className="border-t-2 border-dashed border-gray-400 my-4" />
+            <table className="w-full text-sm">
+              
+                  <tbody className="text-sm text-right md:text-lg">
+                    <tr className="">
+                      <td className="py-1 font-medium">Harga Kue</td>
+                      <td className="py-1">{formatRupiah(data.basePrice)}</td>
+                    </tr>
+                    <tr className="">
+                      <td className="py-1 font-medium">Topping dan Lainnya</td>
+                      <td className="py-1">{formatRupiah(data.totalAddOn)}</td>
+                    </tr>
 
-            <div>
+                    <tr className="text-lg" style={{ color: "#800000" }}>
+                      <td className="py-1 font-bold">Total Harga</td>
+                      <td className="py-1 font-bold">{formatRupiah(data.totalPrice)}</td>
+                    </tr>
+                  
+                  </tbody>
+                </table>
+            
+            <div className="border-t-2 border-dashed border-gray-400 my-4" />
+            <div className="mt-10">
             <h2 className="md:text-xl font-bold">Pembayaran</h2>
             <p className="md:text-lg">Transfer BCA</p>
-            <p className="md:text-lg">Rek. 8010763836</p>
+            <p className="md:text-lg">8010763836</p>
             <span className="md:text-lg">A.N Dini Rizkita Sari</span>
             </div>
             

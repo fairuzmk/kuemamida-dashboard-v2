@@ -44,7 +44,7 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Add Product", path: "/add-custom-product", pro: false },
       { name: "List Product", path: "/list-custom-product", pro: false },
-      { name: "Data Harga", path: "/data-custom-order", pro: false },
+      { name: "Data Harga", path: "/list-data-kue", pro: false },
     ],
   },
   {

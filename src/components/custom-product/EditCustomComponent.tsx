@@ -22,6 +22,74 @@ export default function EditCustomComponent() {
   const [files, setFiles] = useState<File[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<string>("pending");
 
+  const [pilihanDiameter, setPilihanDiameter] = useState<{ value: string; label: string; price?: number }[]>([]);
+  const [pilihanBentuk, setPilihanBentuk] = useState<{ value: string; label: string; price?: number }[]>([]);
+  const [pilihanRasa, setPilihanRasa] = useState<{ value: string; label: string; price?: number }[]>([]);
+  const [pilihanFilling, setPilihanFilling] = useState<{ value: string; label: string; price?: number }[]>([]);
+  const [pilihanKrim, setPilihanKrim] = useState<{ value: string; label: string; price?: number }[]>([]);
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        const res = await axios.get(`${url}/api/options`);
+        const allOptions = res.data.data.map((doc: any) => doc.options || {});
+        const mergedOptions = Object.assign({}, ...allOptions);
+
+        if (mergedOptions) {
+          const diameterList = mergedOptions["Diameter"] || [];
+          const bentukList = mergedOptions["Bentuk"] || [];
+          const rasaList = mergedOptions["Rasa"] || [];
+          const fillingList = mergedOptions["Filling"] || [];
+          const krimList = mergedOptions["Krim"] || [];
+  
+          const formattedDiameter = diameterList.map((item: any) => ({
+            value: item.value,
+            label: item.label,
+            price: item.price,
+          }));
+  
+          const formattedBentuk = bentukList.map((item: any) => ({
+            value: item.value,
+            label: item.label, 
+            price: item.price,
+          }));
+
+          const formattedRasa = rasaList.map((item: any) => ({
+            value: item.value,
+            label: item.label, 
+            price: item.price,
+          }));
+
+          const formattedFilling = fillingList.map((item: any) => ({
+            value: item.value,
+            label: item.label, 
+            price: item.price,
+          }));
+
+          const formattedKrim = krimList.map((item: any) => ({
+            value: item.value,
+            label: item.label, 
+            price: item.price,
+          }));
+
+          
+
+          setPilihanDiameter(formattedDiameter);
+          setPilihanBentuk(formattedBentuk);
+          setPilihanRasa(formattedRasa);
+          setPilihanFilling(formattedFilling);
+          setPilihanKrim(formattedKrim);
+
+        }
+      } catch (err) {
+        console.error("Gagal mengambil data opsi:", err);
+      }
+    };
+
+
+    fetchOptions();
+  }, []);
+
   const [data, setData] = useState({
     customerName: "",
     phone: "",
@@ -57,19 +125,7 @@ export default function EditCustomComponent() {
     { value: "Cancelled", label: "Dibatalkan" },
   ];
 
-  const pilihanDiameter = [
-    { value: "16", label: "16 cm", price: 100000 },
-    { value: "18", label: "18 cm", price: 120000 },
-    { value: "20", label: "20 cm", price: 140000 },
-    { value: "22", label: "22 cm", price: 150000 },
-    { value: "custom", label: "Custom Size" },
-  ];
 
-  const pilihanBentuk = [
-    { value: "Round", label: "Bulat" },
-    { value: "Square", label: "Kotak" },
-    { value: "Custom", label: "Custom" },
-  ];
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -95,6 +151,7 @@ export default function EditCustomComponent() {
         });
 
         setSelectedStatus(fetched.status || "Pending");
+
         setAddOns(
           Array.isArray(fetched.addOns) && fetched.addOns.length > 0
             ? fetched.addOns
@@ -160,12 +217,52 @@ export default function EditCustomComponent() {
 
 
   useEffect(() => {
+ // Ambil item yang dipilih user dari daftar opsi
+    const selectedDiameter = pilihanDiameter.find(item => item.value === data.cakeSize);
+    const selectedBentuk = pilihanBentuk.find(item => item.value === data.cakeShape);
+    const selectedRasa = pilihanRasa.find(item => item.value === data.cakeFlavor);
+    const selectedFilling = pilihanFilling.find(item => item.value === data.filling);
+    const selectedKrim = pilihanKrim.find(item => item.value === data.krimFlavor);
+  
+    const totalOptPrice = [
+      selectedDiameter?.price || 0,
+      selectedBentuk?.price || 0,
+      selectedRasa?.price || 0,
+      selectedFilling?.price || 0,
+      selectedKrim?.price || 0,
+    ].reduce((acc, val) => acc + val, 0);
+  
+    
+    setData(prev => ({ ...prev, basePrice: totalOptPrice }));
+  
+    // Hitung total Add On
     const totalAddOnPrice = addOns.reduce((sum, item) => sum + item.addOnPrice, 0);
-    setData((prev) => ({ ...prev, totalAddOn: totalAddOnPrice }));
-    const total = data.basePrice + data.topperPrice + totalAddOnPrice;
-    setData((prev) => ({ ...prev, totalPrice: total }));
-  }, [data.basePrice, data.topperPrice, addOns]);
+    setData(prev => ({ ...prev, totalAddOn: totalAddOnPrice }));
+  
+    // Hitung total harga keseluruhan
+    const total = totalOptPrice + data.topperPrice + totalAddOnPrice;
+    setData(prev => ({ ...prev, totalPrice: total }));
+  }, [
+    data.cakeSize,
+    data.cakeShape,
+    data.cakeFlavor,
+    data.filling,
+    data.krimFlavor,
+    data.topperPrice,
+    addOns,
+    pilihanDiameter,
+    pilihanBentuk,
+    pilihanRasa,
+    pilihanFilling,
+    pilihanKrim
+  ]);
 
+    // Ambil item yang dipilih user dari daftar opsi
+    const selectedDiameter = pilihanDiameter.find(item => item.value === data.cakeSize);
+    const selectedBentuk = pilihanBentuk.find(item => item.value === data.cakeShape);
+    const selectedRasa = pilihanRasa.find(item => item.value === data.cakeFlavor);
+    const selectedFilling = pilihanFilling.find(item => item.value === data.filling);
+    const selectedKrim = pilihanKrim.find(item => item.value === data.krimFlavor);
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
@@ -236,36 +333,119 @@ export default function EditCustomComponent() {
           <Label>Deskripsi</Label>
           <Input name="description" value={data.description} onChange={onChangeHandler} />
         </div>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
+
+       <div className="grid grid-cols-2 gap-6">
+            <div>
             <Label>Diameter Kue</Label>
-            <Select options={pilihanDiameter} value={data.cakeSize} onChange={(v) => onSelectChange("cakeSize", v)} />
-          </div>
-          <div>
-            <Label>Harga Base</Label>
-            <Input type="number" name="basePrice" value={data.basePrice} onChange={onChangeHandler} />
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
+            <Select
+                options={pilihanDiameter}
+                placeholder="Select an option"
+                onChange={(value) => onSelectChange("cakeSize", value)}
+                className="dark:bg-dark-900"
+                name="cakeSize"
+                value={data.cakeSize}
+            />
+            </div>
+            <div>
+            
+            <div>
             <Label>Bentuk Kue</Label>
-            <Select options={pilihanBentuk} value={data.cakeShape} onChange={(v) => onSelectChange("cakeShape", v)} />
-          </div>
-          <div>
+            <Select
+                options={pilihanBentuk}
+                placeholder="Pilih Bentuk Kue"
+                onChange={(value) => onSelectChange("cakeShape", value)}
+                className="dark:bg-dark-900"
+                name="cakeShape"
+                value={data.cakeShape}
+            />
+            </div>    
+            
+            </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+           
+            <div>
             <Label>Rasa Kue</Label>
-            <Input name="cakeFlavor" value={data.cakeFlavor} onChange={onChangeHandler} />
-          </div>
+            <Select
+              options={pilihanRasa}
+              placeholder="Pilih Rasa Kue" 
+              onChange={(value) => onSelectChange("cakeFlavor", value)} 
+              name="cakeFlavor"
+              value={data.cakeFlavor}/>
+            </div>
+
+            <div>
+            <Label>Rasa Krim</Label>
+            <Select 
+            options= {pilihanKrim}
+            name="krimFlavor"
+            placeholder="Pilih Krim Kue"
+            onChange={(value) => onSelectChange("krimFlavor", value)} 
+            value={data.krimFlavor}/>
+            </div>
+
         </div>
         <div className="grid grid-cols-2 gap-6">
+        <div>
+            <Label>Filling Kue</Label>
+            <Select 
+              options ={pilihanFilling}
+              placeholder = "Pilih Filling Kue"
+              name="filling"
+              onChange={(value) => onSelectChange("filling", value)} 
+              value={data.filling}/>
+            </div>
+
+           
+        </div> 
+
           <div>
-            <Label>Filling</Label>
-            <Input name="filling" value={data.filling} onChange={onChangeHandler} />
+            <Label htmlFor="tm">Sub Total Base</Label>
+            <div className="relative">
+                <Input
+                type="number"
+                placeholder="Total Add On Produk"
+                className="pl-[62px]"
+                name="basePrice"
+                onChange={onChangeHandler}
+                value={data.basePrice}
+                disabled
+                />
+                <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
+                Rp
+                </span>
+               
+            </div>
+            
+            <p className="text-red-500 text-sm mt-3 space-y-1">
+              {(selectedDiameter?.price ?? 0) > 0 && (
+                <span className="block">
+                  Base Diameter: Rp {selectedDiameter?.price?.toLocaleString()}
+                </span>
+              )}
+              {(selectedBentuk?.price ?? 0) > 0 && (
+                <span className="block">
+                  Bentuk Kue: Rp {selectedBentuk?.price?.toLocaleString()}
+                </span>
+              )}
+              {(selectedRasa?.price ?? 0) > 0 && (
+                <span className="block">
+                  Rasa Kue: Rp {selectedRasa?.price?.toLocaleString()}
+                </span>
+              )}
+              {(selectedFilling?.price ?? 0) > 0 && (
+                <span className="block">
+                  Filling Kue: Rp {selectedFilling?.price?.toLocaleString()}
+                </span>
+              )}
+              {(selectedKrim?.price ?? 0) > 0 && (
+                <span className="block">
+                  Krim Kue: Rp {selectedKrim?.price?.toLocaleString()}
+                </span>
+              )}
+            </p>
           </div>
-          <div>
-            <Label>Rasa Krim</Label>
-            <Input name="krimFlavor" value={data.krimFlavor} onChange={onChangeHandler} />
-          </div>
-        </div>
         <div className="grid grid-cols-2 gap-6">
           <div>
             <Label>Warna Krim</Label>

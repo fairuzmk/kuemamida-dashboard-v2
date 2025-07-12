@@ -26,13 +26,15 @@ import AddCustomProduct from "./pages/AddCustomProduct/AddCustomProduct";
 import ListCustomProduct from "./pages/ListCustomProduct/ListCustomProduct";
 import InvoiceCustom from "./pages/InvoiceCustom/InvoiceCustom";
 import EditCustomProduct from "./pages/EditCustomProduct/EditCustomProduct";
+import AddDataKuePage from "./pages/DataKue/AddDataKuePage";
+import ListDataKuePage from "./pages/DataKue/ListDataKuePage";
 
 
 
 
 export default function App() {
   
-  //const urlServer = "http://localhost:4000";
+  // const urlServer = "http://localhost:4000";
 
  const urlServer = "https://kuemamida-backend.onrender.com";
 
@@ -51,6 +53,7 @@ export default function App() {
             {/* Add Products */}
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/add-custom-product" element={<AddCustomProduct />} />
+            <Route path="/add-data-kue" element={< AddDataKuePage/>} />
             
             {/* Edit Products */}
             <Route path="/edit-product/:id" element={<EditProduct />} />
@@ -60,7 +63,8 @@ export default function App() {
             <Route path="/list-product" element={<ListProduct />} />
             <Route path="/list-custom-product" element={<ListCustomProduct />} />
             <Route path="/invoice-custom/:id" element={<InvoiceCustom />} />
-            <Route path="/data-custom-order" element={<ListProduct />} />
+            
+            <Route path="/list-data-kue" element={< ListDataKuePage/>} />
 
             {/* Orders */}
             <Route path="/orders" element={<OrderPage/>} />
