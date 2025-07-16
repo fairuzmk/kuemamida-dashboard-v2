@@ -285,7 +285,7 @@ export default function EditCustomComponent() {
     const selectedRasa = pilihanRasa.find(item => item.value === data.cakeFlavor);
     const selectedFilling = pilihanFilling.find(item => item.value === data.filling);
     const selectedKrim = pilihanKrim.find(item => item.value === data.krimFlavor);
-    const selectedShipping = pilihanShipping.find(item => item.value === data.shipping_method);
+ 
 
   const handleStatusChange = (value: string) => {
     setSelectedStatus(value);
