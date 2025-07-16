@@ -11,6 +11,8 @@ import axios from "axios";
 import { useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
 import { useUrl } from "../../context/UrlContext";
+import { FaTrash } from "react-icons/fa";
+import { MdOutlinePlaylistAdd } from "react-icons/md";
 
 
 
@@ -63,6 +65,13 @@ export default function EditProductComponent() {
     { value: "Kue Kering", label: "Kue Kering" },
   ];
 
+  type VariansType ={
+    varianName: string;
+    varianPrice: number;
+    varianStock: number;
+
+  };
+
   type Product = {
     _id: string;
     name: string;
@@ -72,7 +81,11 @@ export default function EditProductComponent() {
     description: string;
     inStock: boolean;
     image: string;
+    varians: VariansType[];
   };
+  
+
+  const [varians, setVarians] = useState<VariansType[]>([{ varianName: "", varianPrice: 0, varianStock:0, }]);
 
   const fetchProduct = async () => {
     try {
@@ -87,6 +100,13 @@ export default function EditProductComponent() {
           description: product.description,
           inStock: !!product.inStock,
         });
+
+        setVarians(
+          Array.isArray(product.varians) && product.varians.length > 0
+            ? product.varians
+            : [{ varianName: "", varianPrice: 0, varianStock: 0 }]
+        )
+
         setPreviewImage(product.image);
       }
     } catch (err) {
@@ -97,6 +117,27 @@ export default function EditProductComponent() {
   useEffect(() => {
     fetchProduct();
   }, []);
+
+  const handleVarianChange = (
+    index: number,
+    field: keyof VariansType,
+    value: string | number | number
+  ) => {
+    const newVarians = [...varians];
+    newVarians[index] = {
+      ...newVarians[index],
+      [field]: ["varianPrice", "varianStock"].includes(field) ? Number(value) : value as string,
+    };
+    setVarians(newVarians);
+  };
+
+  const handleAddVarian = () => {
+    setVarians([...varians, { varianName: "", varianPrice: 0, varianStock: 0, }]);
+  };
+
+  const handleRemoveVarian = (index: number) => {
+    setVarians((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -121,6 +162,7 @@ export default function EditProductComponent() {
     formData.append("price", data.price);
     formData.append("stock", data.stock);
     formData.append("description", data.description);
+    formData.append("varians", JSON.stringify(varians));
     formData.append("inStock", (data.inStock ?? false).toString());
     if (files.length > 0) {
       formData.append("image", files[0]); // <-- jika ganti gambar
@@ -192,6 +234,63 @@ export default function EditProductComponent() {
               />
             </div>
           </div>
+
+          <div className="space-y-4">
+            <Label>Tambahkan Varian</Label>
+            {varians.map((item, index) => (
+              <>
+
+              <div key={index} className="grid gridcols-1 md:grid-cols-2 gap-4 items-start">
+                  <div>
+                    <Input
+                      type="text"
+                      placeholder="Nama Add On"
+                      value={item.varianName}
+                      onChange={(e) => handleVarianChange(index, "varianName", e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="relative w-full">
+                      <Input
+                        type="number"
+                        placeholder="Harga Add On"
+                        className="pl-[62px]"
+                        value={item.varianPrice}
+                        onChange={(e) => handleVarianChange(index, "varianPrice", e.target.value)}
+                      />
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 px-3 py-2 border-r">
+                        Rp
+                      </span>
+                    </div>
+                      {varians.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVarian(index)}
+                          className="text-white text-sm bg-red-400 px-3 py-3 rounded-md"
+                        >
+                          <FaTrash/>
+                        </button>
+                        
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleAddVarian}
+                        className="my-2 px-2.5 py-2.5 bg-blue-500 text-lg text-white rounded-md hover:bg-blue-600"
+                      >
+                        <MdOutlinePlaylistAdd />
+                      </button>
+                      
+                    </div>
+                  
+                </div>
+                <div className="border-t-1 border-dashed border-gray-400 my-3"/>
+                
+                </>
+              ))}
+
+          
+        </div>
 
           <div>
             <Label>Deskripsi</Label>
