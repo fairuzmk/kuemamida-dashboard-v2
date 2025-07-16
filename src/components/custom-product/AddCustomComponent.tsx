@@ -45,6 +45,7 @@ const onDrop = (acceptedFiles: File[]) => {
   const [pilihanRasa, setPilihanRasa] = useState<{ value: string; label: string; price?: number }[]>([]);
   const [pilihanFilling, setPilihanFilling] = useState<{ value: string; label: string; price?: number }[]>([]);
   const [pilihanKrim, setPilihanKrim] = useState<{ value: string; label: string; price?: number }[]>([]);
+  const [pilihanShipping, setPilihanShipping] = useState<{ value: string; label: string; price?: number }[]>([]);
 
 
   useEffect(() => {
@@ -60,6 +61,7 @@ const onDrop = (acceptedFiles: File[]) => {
           const rasaList = mergedOptions["Rasa"] || [];
           const fillingList = mergedOptions["Filling"] || [];
           const krimList = mergedOptions["Krim"] || [];
+          const shippingList = mergedOptions["Shipping Fee"] || [];
   
           const formattedDiameter = diameterList.map((item: any) => ({
             value: item.value,
@@ -91,6 +93,11 @@ const onDrop = (acceptedFiles: File[]) => {
             price: item.price,
           }));
 
+          const formattedShipping = shippingList.map((item: any) => ({
+            value: item.value,
+            label: item.label, 
+            price: item.price,
+          }));
           
 
           setPilihanDiameter(formattedDiameter);
@@ -98,6 +105,7 @@ const onDrop = (acceptedFiles: File[]) => {
           setPilihanRasa(formattedRasa);
           setPilihanFilling(formattedFilling);
           setPilihanKrim(formattedKrim);
+          setPilihanShipping(formattedShipping);
 
         }
       } catch (err) {
@@ -139,10 +147,9 @@ const onDrop = (acceptedFiles: File[]) => {
     description: "",
     basePrice: 0,
     totalPrice: 0,
-
+    pickupTime: "",
     cakeSize: "", 
     cakeShape: "",
-
     cakeFlavor:"",
     krimFlavor:"",
     filling:"",
@@ -153,6 +160,8 @@ const onDrop = (acceptedFiles: File[]) => {
     totalAddOn: 0,
     pickupDate:"",
     status:"",
+    shipping_method:"",
+    shipping_fee:0,
     createdAt:new Date().toISOString(),
   })
 
@@ -196,20 +205,23 @@ const onDrop = (acceptedFiles: File[]) => {
       [name]: event.target.type === "number" ? Number(value) : value,
     }));
     
-    // if (name === "price") {
-    
-    //   const cleaned = value.replace(/\D/g, "");
-    //   setData((prev) => ({ ...prev, [name]: cleaned }));
-    // } else {
-    //   setData((prev) => ({ ...prev, [name]: value }));
-    // }
+
 
   }
   
   const onSelectChange = (field: string, value: string) => {
+    let extra = {};
+
+    if (field === "shipping_method") {
+      const selected = pilihanShipping.find((item) => item.value === value);
+      extra = {
+        shipping_fee: selected?.price || 0,
+      };
+    }
     setData((prev) => ({
       ...prev,
       [field]: value,
+      ...extra,
     }));
 
 
@@ -226,6 +238,7 @@ const onDrop = (acceptedFiles: File[]) => {
     const selectedRasa = pilihanRasa.find(item => item.value === data.cakeFlavor);
     const selectedFilling = pilihanFilling.find(item => item.value === data.filling);
     const selectedKrim = pilihanKrim.find(item => item.value === data.krimFlavor);
+    const selectedShipping = pilihanShipping.find(item => item.value === data.shipping_method);
   
     const totalOptPrice = [
       selectedDiameter?.price || 0,
@@ -233,17 +246,22 @@ const onDrop = (acceptedFiles: File[]) => {
       selectedRasa?.price || 0,
       selectedFilling?.price || 0,
       selectedKrim?.price || 0,
+      
     ].reduce((acc, val) => acc + val, 0);
-  
+    
     
     setData(prev => ({ ...prev, basePrice: totalOptPrice }));
   
     // Hitung total Add On
     const totalAddOnPrice = addOns.reduce((sum, item) => sum + item.addOnPrice, 0);
     setData(prev => ({ ...prev, totalAddOn: totalAddOnPrice }));
-  
+    
+    //Hitung Shipping
+    const shippingFee = selectedShipping?.price || 0;
+
+    setData(prev => ({ ...prev, shipping_fee: shippingFee }));
     // Hitung total harga keseluruhan
-    const total = totalOptPrice + data.topperPrice + totalAddOnPrice;
+    const total = totalOptPrice + data.topperPrice + totalAddOnPrice + shippingFee;
     setData(prev => ({ ...prev, totalPrice: total }));
   }, [
     data.cakeSize,
@@ -252,6 +270,7 @@ const onDrop = (acceptedFiles: File[]) => {
     data.filling,
     data.krimFlavor,
     data.topperPrice,
+    data.shipping_method,
     addOns,
     pilihanDiameter,
     pilihanBentuk,
@@ -267,6 +286,7 @@ const onDrop = (acceptedFiles: File[]) => {
   const selectedRasa = pilihanRasa.find(item => item.value === data.cakeFlavor);
   const selectedFilling = pilihanFilling.find(item => item.value === data.filling);
   const selectedKrim = pilihanKrim.find(item => item.value === data.krimFlavor);
+  const selectedShipping = pilihanShipping.find(item => item.value === data.shipping_method);
   
 
   
@@ -294,10 +314,12 @@ const onDrop = (acceptedFiles: File[]) => {
     formData.append("topper", data.topper)
     formData.append("topperPrice", data.topperPrice.toString())
     formData.append("totalAddOn", data.totalAddOn.toString())
+    formData.append("pickupTime", data.pickupTime)
     formData.append("pickupDate", data.pickupDate)
     formData.append("status", data.status)
     formData.append("createdAt", data.createdAt)
-    
+    formData.append("shipping_method", data.shipping_method)
+    formData.append("shipping_fee", data.shipping_fee.toString())
     formData.append("additionalImages", files[0]);
     
 
@@ -328,7 +350,10 @@ const onDrop = (acceptedFiles: File[]) => {
       topperPrice: 0,
       totalAddOn: 0,
       pickupDate:"",
+      pickupTime:"",
       status:"",
+      shipping_method:"",
+      shipping_fee:0,
       createdAt:"",
       })
 
@@ -451,7 +476,7 @@ const onDrop = (acceptedFiles: File[]) => {
             <div className="relative">
                 <Input
                 type="number"
-                placeholder="Total Add On Produk"
+                placeholder="Total Base Produk"
                 className="pl-[62px]"
                 name="basePrice"
                 onChange={onChangeHandler}
@@ -517,36 +542,7 @@ const onDrop = (acceptedFiles: File[]) => {
 
         </div>
 
-        {/* <div className="grid grid-cols-2 gap-6">
-            <div>
-            <Label>Topper</Label>
-            <Input 
-            type="text"  
-            id="topper"
-            name="topper"
-            placeholder="Topper"
-            onChange={onChangeHandler} value={data.topper}/>
-
-            </div>
-            <div>
-            <Label htmlFor="tm">Harga Topper</Label>
-            <div className="relative">
-                <Input
-                type="number"
-                placeholder="Harga Topper"
-                className="pl-[62px]"
-                name="topperPrice"
-                onChange={onChangeHandler}
-                value={data.topperPrice}
-                />
-                <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
-                Rp
-                </span>
-            </div>
-            </div>
-        </div> */}
-
-        
+              
         <div className="space-y-4">
             <Label>Topper dan Lainnya (Add On)</Label>
             {addOns.map((item, index) => (
@@ -621,30 +617,80 @@ const onDrop = (acceptedFiles: File[]) => {
                 Rp
                 </span>
             </div>
+          
+        
+        <div className="grid md:grid-cols-2 gap-4 mt-3 mb-3">
+          <div>
+          <DatePicker
+              id="date-picker"
+              label="Tanggal Penjemputan"
+              placeholder="Pilih Tanggal"
+              onChange={(dates: Date[]) => {
+                const date = dates?.[0];
+                if (!date) return;
+              
+                const formatted = date.toISOString().split("T")[0]; // "2025-07-05"
+              
+                setData((prev) => ({
+                  ...prev,
+                  pickupDate: formatted,
+                }));
+              }}
+              
+            />
+          </div>
+          <div>
+          <Label>Jam Penjemputan</Label>
+          <Input 
+              type="text"  
+              id="pickupTime"
+              name="pickupTime"
+              placeholder="Masukkan Jam (Jam 16.00 / Sore)"
+              onChange={onChangeHandler} value={data.pickupTime}/>
+          </div>
+        
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+            <div>
+            <Label>Shipping Method</Label>
+            <Select
+                options={pilihanShipping}
+                placeholder="Select an option"
+                onChange={(value) => onSelectChange("shipping_method", value)}
+                className="dark:bg-dark-900"
+                name="shipping_method"
+                value={data.shipping_method}
+            />
+            </div>
 
 
-        <div className="mt-3 mb-3">
-        <DatePicker
-            id="date-picker"
-            label="Tanggal Penjemputan"
-            placeholder="Select a date"
-            onChange={(dates: Date[]) => {
-              const date = dates?.[0];
-              if (!date) return;
+            <div>
             
-              const formatted = date.toISOString().split("T")[0]; // "2025-07-05"
+                       
+            <Label htmlFor="tm">Shipping Fee</Label>
+            <div className="relative">
+                <Input
+                type="number"
+                placeholder="Shipping Fee"
+                className="pl-[62px]"
+                name="shipping_fee"
+                onChange={onChangeHandler}
+                value={data.shipping_fee}
+                disabled
+                />
+                <span className="absolute left-0 top-1/2 flex h-11 w-[46px] -translate-y-1/2 items-center justify-center border-r border-gray-200 dark:border-gray-800">
+                Rp
+                </span>
+               
+            </div>
             
-              setData((prev) => ({
-                ...prev,
-                pickupDate: formatted,
-              }));
-            }}
-            
-          />
+            </div>
         </div>
 
         <div className="mt-5 mb-5 flex flex-col items-start md:flex-row md:items-start gap-8">
-        <h2 className="text-md">Status Pesanan</h2>
+          <Label>Status Pesanan</Label>
+        
         {statusList.map((item) => (
         <Radio
           id={`status-${item.value}`}
@@ -678,6 +724,24 @@ const onDrop = (acceptedFiles: File[]) => {
                 </span>
             </div>
             </div>
+            <p className="text-blue-500 text-sm mt-1 mb-3 space-y-1">
+              {(data.basePrice) > 0 && (
+                <span className="block">
+                  Base Price: Rp {data.basePrice.toLocaleString()}
+                </span>
+              )}
+              {(data.totalAddOn) > 0 && (
+                <span className="block">
+                  Add On: Rp {data.totalAddOn.toLocaleString()}
+                </span>
+              )}
+              {(data.shipping_fee) > 0 && (
+                <span className="block">
+                  Ongkir: {data.shipping_fee.toLocaleString()}
+                </span>
+              )}
+              
+            </p>
 
          
        

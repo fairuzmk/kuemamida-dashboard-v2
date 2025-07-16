@@ -104,7 +104,7 @@ const InvoiceComponent = () => {
     .join('\n');
     return `*Invoice Pemesanan Kue Mamida 🍰*\n
 *Nama Pemesan:* ${data.customerName}
-*Tanggal Diambil:* ${formatDate(data.pickupDate)}
+*Tanggal Diambil:* ${formatDate(data.pickupDate)} ${data.pickupTime}
 
 -----------------------------
 *Deskripsi:* ${data.description}
@@ -169,7 +169,11 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                 </tr>
                 <tr>
                   <td><p className="text-sm md:text-lg"><strong>Tanggal Diambil : </strong>  </p> </td>
-                  <td className="text-right"><p className="text-sm md:text-lg">{formatDate(data.pickupDate)}</p></td>
+                  <td className="text-right"><p className="text-sm md:text-lg">{formatDate(data.pickupDate)} / {data.pickupTime}</p></td>
+                </tr>
+                <tr>
+                  <td><p className="text-sm md:text-lg"><strong>Pengiriman: </strong>  </p> </td>
+                  <td className="text-right"><p className="text-sm md:text-lg">{data.shipping_method}</p></td>
                 </tr>
               </tbody>
             </table>
@@ -253,7 +257,15 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                       <td className="py-1 font-medium">Topping dan Lainnya</td>
                       <td className="py-1">{formatRupiah(data.totalAddOn)}</td>
                     </tr>
-
+                    {data.shipping_fee > 0 
+                    ? (<tr className="">
+                      <td className="py-1 font-medium">Ongkir</td>
+                      <td className="py-1">{formatRupiah(data.shipping_fee)}</td>
+                    </tr>) : (
+                      <>
+                      </>
+                    )
+                    }
                     <tr className="text-lg" style={{ color: "#800000" }}>
                       <td className="py-1 font-bold">Total Harga</td>
                       <td className="py-1 font-bold">{formatRupiah(data.totalPrice)}</td>

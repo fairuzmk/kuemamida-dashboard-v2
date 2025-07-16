@@ -5,31 +5,31 @@ import {
     TableHeader,
     TableRow,
   } from "../ui/table";
-  import Badge from "../ui/badge/Badge";
+  // import Badge from "../ui/badge/Badge";
   import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import { useUrl } from "../../context/UrlContext";
-import axios from "axios";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
+  // import { useNavigate } from "react-router";
+  import { useUrl } from "../../context/UrlContext";
+  import axios from "axios";
+  import Swal from "sweetalert2";
+  import { toast } from "react-toastify";
   
-  function statusPesananBadge(status: string) {
-    switch (status) {
-      case "Diantar": return "success";
-      case "Diproses": return "warning";
-      case "Pesanan Baru": return "error";
-      default: return "error";
-    }
-  }
+  // function statusPesananBadge(status: string) {
+  //   switch (status) {
+  //     case "Diantar": return "success";
+  //     case "Diproses": return "warning";
+  //     case "Pesanan Baru": return "error";
+  //     default: return "error";
+  //   }
+  // }
   
-  function statusPaymentBadge(status: string) {
-    switch (status) {
-      case "Paid": return "success";
-      case "COD": return "warning";
-      case "Belum dibayar": return "error";
-      default: return "error";
-    }
-  }
+  // function statusPaymentBadge(status: string) {
+  //   switch (status) {
+  //     case "Paid": return "success";
+  //     case "COD": return "warning";
+  //     case "Belum dibayar": return "error";
+  //     default: return "error";
+  //   }
+  // }
 
 
 
@@ -63,33 +63,34 @@ import { toast } from "react-toastify";
 
 
 
-    // const removeOrder = async(orderId: string) => {
-    //   const result = await Swal.fire({
-    //     title: "Yakin ingin menghapus produk ini?",
-    //     text: "Aksi ini tidak dapat dibatalkan!",
-    //     icon: "warning",
-    //     showCancelButton: true,
-    //     confirmButtonColor: "#d33",
-    //     cancelButtonColor: "#3085d6",
-    //     confirmButtonText: "Ya, hapus!",
-    //     cancelButtonText: "Batal",
-    //   });
-    //   if (result.isConfirmed) {
-    //     try {
-    //       const response = await axios.post(`${url}/api/order/removeorder`, { id: orderId });
+    const handleDeleteOrder = async (orderId: string) => {
+      const confirm = await Swal.fire({
+        title: "Yakin ingin menghapus pesanan ini?",
+        text: "Aksi ini tidak dapat dibatalkan!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, hapus!",
+        cancelButtonText: "Batal",
+      });
     
-    //       if (response.data.success) {
-    //         toast.success("Produk berhasil dihapus.");
-    //         await fetchList();
-    //       } else {
-    //         toast.error(response.data.message || "Gagal menghapus produk.");
-    //       }
-    //     } catch (error) {
-    //       toast.error("Terjadi kesalahan saat menghapus.");
-    //       console.error(error);
-    //     }
-    //   }
-    // };
+      if (confirm.isConfirmed) {
+        try {
+          const response = await axios.post(`${url}/api/order/delete`, {
+            id: orderId,
+          });
+    
+          if (response.data.success) {
+            toast.success("Pesanan berhasil dihapus");
+            fetchList(); // Refresh list
+          } else {
+            toast.error("Gagal menghapus pesanan");
+          }
+        } catch (err) {
+          toast.error("Terjadi kesalahan saat menghapus");
+        }
+      }
+    };
+    
   
     useEffect(()=>{
       fetchList();
@@ -135,26 +136,50 @@ import { toast } from "react-toastify";
       (currentPage - 1) * itemsPerPage,
       currentPage * itemsPerPage
     );
+
     const handleUpdateStatus = async (
       orderId: string,
       newStatus: string,
-      newPayment: boolean
+
     ) => {
       try {
+        console.log("Update order ID:", orderId);
         const response = await axios.post(`${url}/api/order/update-order`, {
           id: orderId,
           status: newStatus,
-          payment: newPayment,
+ 
         });
-
+        
         if (response.data.success) {
-          toast.success("Status pesanan & pembayaran berhasil diupdate");
+          toast.success("Status pesanan berhasil diupdate");
           fetchList();
         } else {
-          toast.error("Gagal mengupdate status");
+          toast.error("Gagal mengupdate status pesanan");
         }
       } catch (error) {
-        toast.error("Terjadi kesalahan saat update status");
+        toast.error("Terjadi kesalahan saat update status pesanan");
+      }
+    };
+
+    const handleUpdatePayment = async (
+      orderId: string,
+      newPayment: string
+    ) => {
+      try {
+        console.log("Update order ID:", orderId);
+        const response = await axios.post(`${url}/api/order/update-order`, {
+          id: orderId,
+          payment: newPayment,
+        });
+        
+        if (response.data.success) {
+          toast.success("Status Pembayaran berhasil diupdate");
+          fetchList();
+        } else {
+          toast.error("Gagal mengupdate status pembayaran");
+        }
+      } catch (error) {
+        toast.error("Terjadi kesalahan saat update status pembayaran");
       }
     };
   
@@ -175,7 +200,11 @@ import { toast } from "react-toastify";
                 >
                   Pemesan
                 </TableCell>
-                <TableCell isHeader className="px-1 py-3 text-theme-xs text-start">Pesanan</TableCell>
+                <TableCell isHeader className="px-1 py-3 text-theme-xs text-start hidden md:table-cell"
+                >Pesanan
+
+                </TableCell>
+                
                 <TableCell
                   isHeader
                   onClick={() => handleSort("totalOrder")}
@@ -190,34 +219,47 @@ import { toast } from "react-toastify";
                 >
                   Status Pesanan
                 </TableCell>
-                <TableCell isHeader className="px-5 py-3 text-theme-xs">Status Pembayaran</TableCell>
+                <TableCell isHeader className="px-5 py-3 text-theme-xs">
+                  Status Pembayaran</TableCell>
+                  <TableCell isHeader className="px-5 py-3 text-theme-xs">
+                  Action</TableCell>
               </TableRow>
             </TableHeader>
   
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
              {list?.map((order, index) => (
-                <TableRow key={order._id || index}>
+                <TableRow key={order._id || index}   className={
+                  order.status === "Pesanan Baru"
+                  ? "bg-blue-50"
+                  : order.status === "Diproses" && order.payment === false
+                  ? "bg-orange-50"
+                  : order.status === "Diproses" && order.payment === true
+                  ? "bg-green-50"
+                  : order.status === "Dibatalkan"
+                  ? "bg-red-50"
+                  : ""
+                }>
                   <TableCell className="px-5 py-4 text-start">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 overflow-hidden rounded-full bg-gray-200">
-                        <img
-                          src="/images/user/default.jpg"
-                          alt={order.address?.name}
-                          width={40}
-                          height={40}
-                        />
-                      </div>
+                      
                       <div>
                         <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                           {order.address?.name || 'Tanpa Nama'}
                         </span>
-                        <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {order._id || 'Tanpa Nama'}
+                        <span className="block font-medium text-gray-400 text-theme-sm dark:text-white/90">
+                          Shipping : {order.shipping_method || ''}
+                        </span>
+                        <span className="block font-medium text-gray-400 text-theme-sm dark:text-white/90">
+                          {order.address?.detail || ''}
+                        </span>
+
+                        <span className="block font-medium text-gray-400 text-theme-sm dark:text-white/90">
+                          Pembayaran : {order.payment_method || ''}
                         </span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-4 py-3 text-start text-theme-sm">
+                  <TableCell className="px-4 py-3 text-start text-theme-sm hidden md:table-cell">
                     {order.items?.map((item: any, i: number) => (
                       <div key={i}>
                         {item.name} x {item.quantity}
@@ -232,24 +274,28 @@ import { toast } from "react-toastify";
                     <select
                       className="border rounded px-2 py-1 text-sm"
                       value={order.status}
-                      onChange={(e) => handleUpdateStatus(order._id, e.target.value, order.payment)}
+                      onChange={(e) => handleUpdateStatus(order._id, e.target.value)}
                     >
                       <option value="Pesanan Baru">Pesanan Baru</option>
                       <option value="Diproses">Diproses</option>
-                      <option value="Diantar">Diantar</option>
+                      <option value="Selesai">Selesai</option>
+                      <option value="Dibatalkan">Dibatalkan</option>
                     </select>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-theme-sm">
-                    <select
-                        className="border rounded px-2 py-1 text-sm"
-                        value={order.payment ? "Paid" : "Belum dibayar"}
-                        onChange={(e) =>
-                          handleUpdateStatus(order._id, order.status, e.target.value === "Paid")
-                        }
-                      >
-                        <option value="Belum dibayar">Belum dibayar</option>
-                        <option value="Paid">Paid</option>
-                      </select>
+                  <select
+                      className="border rounded px-2 py-1 text-sm"
+                      value={order.payment}
+                      onChange={(e) =>
+                        handleUpdatePayment(order._id, e.target.value)
+                      }
+                    >
+                      <option value="true">Sudah Bayar</option>
+                      <option value="false">Belum Bayar</option>
+                    </select>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-theme-sm">
+                  <p className="inline text-blue-500 cursor-pointer">View</p>  | <p className="cursor-pointer inline text-red-700" onClick={()=>handleDeleteOrder(order._id)}>Delete</p>
                   </TableCell>
                 </TableRow>
               ))}
