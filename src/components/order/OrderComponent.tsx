@@ -132,10 +132,10 @@ import {
     });
   
     const totalPages = Math.ceil(sortedData.length / itemsPerPage);
-    const paginatedData = sortedData.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage
-    );
+    // const paginatedData = sortedData.slice(
+    //   (currentPage - 1) * itemsPerPage,
+    //   currentPage * itemsPerPage
+    // );
 
     const handleUpdateStatus = async (
       orderId: string,
