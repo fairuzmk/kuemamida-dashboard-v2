@@ -110,6 +110,7 @@ const InvoiceComponent = () => {
 *Deskripsi:* ${data.description}
 *Ukuran:* ${data.cakeShape} | ${data.cakeSize} cm
 *Rasa:* ${data.cakeFlavor} | Krim: ${data.krimFlavor} | Selai: ${data.filling}
+*Warna:* ${data.themeColor}
 *Tulisan:* ${data.writingOnCake}
 *Topper: * 
 ${addOnList}
@@ -193,6 +194,10 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                       <td className="py-1">{data.cakeFlavor} | Krim: {data.krimFlavor} | Selai: {data.filling}</td>
                     </tr>
                     <tr className="">
+                      <td className="py-1 font-medium">Warna</td>
+                      <td className="py-1">{data.themeColor}</td>
+                    </tr>
+                    <tr className="">
                       <td className="py-1 font-medium">Tulisan</td>
                       <td className="py-1">{data.writingOnCake}</td>
                     </tr>
@@ -258,7 +263,7 @@ BCA 8010763836 a.n. Dini Rizkita Sari
                 </table>
             
             <div className="border-t-2 border-dashed border-gray-400 my-4" />
-            <div className="mt-10">
+            <div className="mt-5">
             <h2 className="md:text-xl font-bold">Pembayaran</h2>
             <p className="md:text-lg">Transfer BCA</p>
             <p className="md:text-lg">8010763836</p>
